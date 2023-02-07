@@ -1,5 +1,5 @@
 **ABOUT:**
-Pet project contains simple chat server.
+<br />Pet project contains simple chat server.
 
 **REQUIREMENTS**
 1. Docker Descktop 4.16 and up.
@@ -7,11 +7,13 @@ Pet project contains simple chat server.
 
 **DEBUG**
 1. Run MS SQLServer in Docker:
-`docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=S3cur3P@ssW0rd!" -p 1433:1433 -d -v my-chat-server_sqlData:/var/opt/mssql mcr.microsoft.com/mssql/server:2022-latest`
+<br />`docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=S3cur3P@ssW0rd!" -p 1433:1433 -d -v my-chat-server_sqlData:/var/opt/mssql mcr.microsoft.com/mssql/server:2022-latest`
 2. Open `src\MyChatServer\MyChatServer.sln` in Visual Studio and run.
 
 **BUILD**
-In `src` folder run `docker compose build`.
+In `src` folder run
+<br />`docker compose build`.
 
 **RUN**
-In `src` folder run `docker compose up`.
+In `src` folder run
+<br />`docker compose up`.
