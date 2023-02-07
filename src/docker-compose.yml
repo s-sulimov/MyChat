@@ -1,0 +1,22 @@
+version: "3.8"
+name: "my-chat-server"
+services:
+  api:
+    build: /MyChatServer
+    ports:
+      - "80:80"
+    depends_on:
+      - db
+
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    volumes:
+      - sqlData:/var/opt/mssql
+    ports:
+      - "1433:1433"
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "S3cur3P@ssW0rd!"
+
+volumes:
+  sqlData:
