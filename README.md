@@ -11,9 +11,9 @@
 2. Open `src\MyChatServer\MyChatServer.sln` in Visual Studio and run.
 
 **BUILD**
-In `src` folder run
-<br />`docker compose build`.
+<br />In `src` folder run
+<br />`docker compose build`
 
 **RUN**
-In `src` folder run
-<br />`docker compose up`.
+<br />In `src` folder run
+<br />`docker compose up`
