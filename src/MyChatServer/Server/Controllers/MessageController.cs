@@ -1,11 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Sulimov.MyChat.Server.BL.Models;
 using Sulimov.MyChat.Server.BL.Services;
 
 namespace Sulimov.MyChat.Server.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
+    [Authorize(Roles = "User")]
     public class MessageController : ControllerBase
     {
         private readonly IMessageService messageService;

@@ -1,0 +1,102 @@
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Sulimov.MyChat.Server.BL.Models;
+using Sulimov.MyChat.Server.Services;
+using System.Data;
+using System.Security.Claims;
+
+namespace Sulimov.MyChat.Server.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public class UsersController : ControllerBase
+    {
+        private readonly UserManager<IdentityUser> userManager;
+        private readonly SignInManager<IdentityUser> signInManager;
+        private readonly IJwtService jwtService;
+
+        public UsersController(UserManager<IdentityUser> userManager, IJwtService jwtService, SignInManager<IdentityUser> signInManager)
+        {
+            this.userManager = userManager;
+            this.jwtService = jwtService;
+            this.signInManager = signInManager;
+        }
+
+        [HttpGet("{login}")]
+        public async Task<ActionResult<User>> GetUser(string login)
+        {
+            IdentityUser user = await userManager.FindByNameAsync(login);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return new User
+            {
+                Name = user.UserName,
+                Email = user.Email
+            };
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<User>> CreateUser(User user)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var result = await userManager.CreateAsync(
+                new IdentityUser()
+                {
+                    UserName = user.Name,
+                    Email = user.Email,
+                },
+                user.Password
+            );
+
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.Errors);
+            }
+
+            var identityUser = await userManager.FindByNameAsync(user.Name);
+            result = await userManager.AddToRoleAsync(identityUser, "User");
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.Errors);
+            }
+
+            return CreatedAtAction("GetUser", new { login = user.Name }, user);
+        }
+
+        [HttpPost("Login")]
+        public async Task<ActionResult<AuthenticationResponse>> Login(AuthenticationRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Bad credentials");
+            }
+
+            var user = await userManager.FindByNameAsync(request.Login);
+
+            if (user == null)
+            {
+                return BadRequest("Bad credentials");
+            }
+
+            var result = await signInManager.CheckPasswordSignInAsync(user, request.Password, false);
+            if (!result.Succeeded)
+            {
+                return BadRequest("Bad credentials");
+            }
+
+            var userRoles = await userManager.GetRolesAsync(user);
+
+            var token = jwtService.CreateToken(user, userRoles.Select(s => new Claim(ClaimTypes.Role, s)));
+
+            return Ok(token);
+        }
+    }
+}

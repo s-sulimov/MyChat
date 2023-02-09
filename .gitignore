@@ -364,4 +364,3 @@ FodyWeavers.xsd
 
 # Application settings file for developer.
 /src/MyChatServer/Server/appsettings.Development.json
-/src/MyChatServer/Server/appsettings.Development.json

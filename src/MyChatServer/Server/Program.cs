@@ -8,10 +8,10 @@ namespace Sulimov.MyChat.Server
         }
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                //.ConfigureLogging(logging =>
-                //{
-                //    logging.AddFile($"{Directory.GetCurrentDirectory()}\\Logs\\log.txt");
-                //})
+                .ConfigureLogging(logging =>
+                {
+                    logging.AddConsole();
+                })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();

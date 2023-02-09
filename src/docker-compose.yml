@@ -19,4 +19,4 @@ services:
       SA_PASSWORD: "S3cur3P@ssW0rd!"
 
 volumes:
-  sqlData:
+  sqlDB:
