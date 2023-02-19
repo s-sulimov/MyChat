@@ -57,11 +57,14 @@ namespace Sulimov.MyChat.Server
                     };
                 });
 
+            services.AddHttpContextAccessor();
 
             services.AddScoped<IMessageService, MessageService>();
+            services.AddScoped<IChateService, ChatService>();
             services.AddScoped<IJwtService, JwtService>();
 
-            services.AddControllers();
+            services.AddControllers()
+                .AddNewtonsoftJson();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -71,6 +74,7 @@ namespace Sulimov.MyChat.Server
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseHttpLogging();
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();

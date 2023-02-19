@@ -8,11 +8,11 @@ namespace Sulimov.MyChat.Server.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [Authorize(Roles = "User")]
-    public class MessageController : ControllerBase
+    public class MessagesController : ControllerBase
     {
         private readonly IMessageService messageService;
         
-        public MessageController(IMessageService messageService)
+        public MessagesController(IMessageService messageService)
         {
             this.messageService = messageService;
         }
