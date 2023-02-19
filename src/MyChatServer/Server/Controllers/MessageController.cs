@@ -26,7 +26,15 @@ namespace Sulimov.MyChat.Server.Controllers
         [HttpPost]
         public async Task<IActionResult> SendMessage(Message message)
         {
-            return Ok(await messageService.SaveMessage(message));
+            var result = await messageService.SaveMessage(message);
+
+            if (result == null)
+            {
+                return BadRequest();
+            }
+
+
+            return Ok(result);
         }
     }
 }

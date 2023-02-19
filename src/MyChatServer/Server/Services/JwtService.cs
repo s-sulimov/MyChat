@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.IdentityModel.Tokens;
 using Sulimov.MyChat.Server.BL.Models;
+using Sulimov.MyChat.Server.DAL.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -20,7 +20,7 @@ namespace Sulimov.MyChat.Server.Services
         }
 
         /// <inheritdoc/>
-        public AuthenticationResponse CreateToken(IdentityUser user, IEnumerable<Claim> roleClaims)
+        public AuthenticationResponse CreateToken(DbUser user, IEnumerable<Claim> roleClaims)
         {
             var expiration = DateTime.UtcNow.AddMinutes(expirationMinutes);
 
@@ -48,7 +48,7 @@ namespace Sulimov.MyChat.Server.Services
                 signingCredentials: credentials
             );
 
-        private Claim[] CreateClaims(IdentityUser user, IEnumerable<Claim> roleClaims)
+        private Claim[] CreateClaims(DbUser user, IEnumerable<Claim> roleClaims)
         {
             var claims = new List<Claim>()
             {

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Sulimov.MyChat.Server.BL.Models;
+using Sulimov.MyChat.Server.DAL.Models;
 using Sulimov.MyChat.Server.Services;
 using System.Data;
 using System.Security.Claims;
@@ -11,21 +12,22 @@ namespace Sulimov.MyChat.Server.Controllers
     [Route("api/[controller]")]
     public class UsersController : ControllerBase
     {
-        private readonly UserManager<IdentityUser> userManager;
-        private readonly SignInManager<IdentityUser> signInManager;
+        private readonly UserManager<DbUser> userManager;
+        private readonly SignInManager<DbUser> signInManager;
         private readonly IJwtService jwtService;
 
-        public UsersController(UserManager<IdentityUser> userManager, IJwtService jwtService, SignInManager<IdentityUser> signInManager)
+        public UsersController(UserManager<DbUser> userManager, IJwtService jwtService, SignInManager<DbUser> signInManager)
         {
             this.userManager = userManager;
             this.jwtService = jwtService;
             this.signInManager = signInManager;
         }
 
+        // api/users/{login}
         [HttpGet("{login}")]
         public async Task<ActionResult<User>> GetUser(string login)
         {
-            IdentityUser user = await userManager.FindByNameAsync(login);
+            DbUser user = await userManager.FindByNameAsync(login);
 
             if (user == null)
             {
@@ -39,16 +41,17 @@ namespace Sulimov.MyChat.Server.Controllers
             };
         }
 
+        // api/users
         [HttpPost]
         public async Task<ActionResult<User>> CreateUser(User user)
         {
-            if (!ModelState.IsValid)
+            if (string.IsNullOrEmpty(user.Name) || string.IsNullOrEmpty(user.Email) || string.IsNullOrEmpty(user.Password))
             {
-                return BadRequest(ModelState);
+                return BadRequest();
             }
 
             var result = await userManager.CreateAsync(
-                new IdentityUser()
+                new DbUser()
                 {
                     UserName = user.Name,
                     Email = user.Email,
@@ -61,8 +64,8 @@ namespace Sulimov.MyChat.Server.Controllers
                 return BadRequest(result.Errors);
             }
 
-            var identityUser = await userManager.FindByNameAsync(user.Name);
-            result = await userManager.AddToRoleAsync(identityUser, "User");
+            var DbUser = await userManager.FindByNameAsync(user.Name);
+            result = await userManager.AddToRoleAsync(DbUser, "User");
             if (!result.Succeeded)
             {
                 return BadRequest(result.Errors);
@@ -71,7 +74,8 @@ namespace Sulimov.MyChat.Server.Controllers
             return CreatedAtAction("GetUser", new { login = user.Name }, user);
         }
 
-        [HttpPost("Login")]
+        // api/users/login
+        [HttpPost("login")]
         public async Task<ActionResult<AuthenticationResponse>> Login(AuthenticationRequest request)
         {
             if (!ModelState.IsValid)

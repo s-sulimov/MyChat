@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Sulimov.MyChat.Server.BL.Services;
 using Sulimov.MyChat.Server.DAL;
+using Sulimov.MyChat.Server.DAL.Models;
 using Sulimov.MyChat.Server.Services;
 using System.Text;
 
@@ -24,7 +25,7 @@ namespace Sulimov.MyChat.Server
             services.AddDbContext<DataContext>(opt => opt.UseSqlServer(connectionString));
 
             services
-                .AddIdentityCore<IdentityUser>(options =>
+                .AddIdentityCore<DbUser>(options =>
                 {
                     options.SignIn.RequireConfirmedAccount = false;
                     options.User.RequireUniqueEmail = true;

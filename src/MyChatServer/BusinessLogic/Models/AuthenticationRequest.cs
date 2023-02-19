@@ -7,9 +7,15 @@ namespace Sulimov.MyChat.Server.BL.Models
     /// </summary>
     public class AuthenticationRequest
     {
+        /// <summary>
+        /// User login.
+        /// </summary>
         [Required]
         public string Login { get; set; }
 
+        /// <summary>
+        /// Password.
+        /// </summary>
         [Required]
         public string Password { get; set; }
     }
