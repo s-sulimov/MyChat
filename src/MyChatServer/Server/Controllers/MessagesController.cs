@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Sulimov.MyChat.Server.BL.Models;
 using Sulimov.MyChat.Server.BL.Services;
+using System.Security.Claims;
 
 namespace Sulimov.MyChat.Server.Controllers
 {
@@ -11,10 +12,12 @@ namespace Sulimov.MyChat.Server.Controllers
     public class MessagesController : ControllerBase
     {
         private readonly IMessageService messageService;
-        
-        public MessagesController(IMessageService messageService)
+        private readonly IHttpContextAccessor httpContextAccessor;
+
+        public MessagesController(IMessageService messageService, IHttpContextAccessor httpContextAccessor)
         {
             this.messageService = messageService;
+            this.httpContextAccessor = httpContextAccessor;
         }
 
         [HttpGet]
@@ -26,7 +29,8 @@ namespace Sulimov.MyChat.Server.Controllers
         [HttpPost]
         public async Task<IActionResult> SendMessage(Message message)
         {
-            var result = await messageService.SaveMessage(message);
+            var userId = this.httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var result = await messageService.SaveMessage(message, userId);
 
             if (result == null)
             {

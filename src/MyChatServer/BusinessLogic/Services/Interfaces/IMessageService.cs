@@ -11,8 +11,9 @@ namespace Sulimov.MyChat.Server.BL.Services
         /// Save message.
         /// </summary>
         /// <param name="message">Message.</param>
+        /// /// <param name="senderId">Sender ID.</param>
         /// <returns>Saved message.</returns>
-        public Task<Message> SaveMessage(Message message);
+        public Task<Message> SaveMessage(Message message, string senderId);
  
         /// <summary>
         /// Get all message from chat.

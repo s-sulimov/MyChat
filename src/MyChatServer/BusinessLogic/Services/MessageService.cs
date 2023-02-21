@@ -36,7 +36,7 @@ namespace Sulimov.MyChat.Server.BL.Services
         }
 
         /// <inheritdoc/>
-        public async Task<Message> SaveMessage(Message message)
+        public async Task<Message> SaveMessage(Message message, string senderId)
         {
             DbChat chat = null;
             if (message.ChatId != 0)
@@ -45,7 +45,7 @@ namespace Sulimov.MyChat.Server.BL.Services
             }
             else
             {
-                chat = await GetPrivateChat(message.Sender.Id, message.RecepientId, null);
+                chat = await GetPrivateChat(senderId, message.RecepientId, null);
             }
 
             if (chat == null)
@@ -55,7 +55,7 @@ namespace Sulimov.MyChat.Server.BL.Services
             
             var dbModel = new DbMessage
             {
-                SenderId = message.Sender.Id,
+                SenderId = senderId,
                 ChatId = chat.Id,
                 Date = DateTime.UtcNow,
                 Text = message.Text,

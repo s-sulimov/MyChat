@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Sulimov.MyChat.Server.BL.Models;
 using Sulimov.MyChat.Server.DAL.Models;
 using Sulimov.MyChat.Server.Services;
@@ -10,21 +12,24 @@ namespace Sulimov.MyChat.Server.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class UsersController : ControllerBase
     {
         private readonly UserManager<DbUser> userManager;
         private readonly SignInManager<DbUser> signInManager;
         private readonly IJwtService jwtService;
 
-        public UsersController(UserManager<DbUser> userManager, IJwtService jwtService, SignInManager<DbUser> signInManager)
+        public UsersController(UserManager<DbUser> userManager,
+            IJwtService jwtService,
+            SignInManager<DbUser> signInManager)
         {
             this.userManager = userManager;
             this.jwtService = jwtService;
             this.signInManager = signInManager;
         }
 
-        // api/users/{login}
-        [HttpGet("{login}")]
+        // api/users
+        [HttpGet]
         public async Task<ActionResult<User>> GetUser(string login)
         {
             DbUser user = await userManager.FindByNameAsync(login);
@@ -36,6 +41,7 @@ namespace Sulimov.MyChat.Server.Controllers
 
             return new User
             {
+                Id = user.Id,
                 Name = user.UserName,
                 Email = user.Email
             };
@@ -43,6 +49,7 @@ namespace Sulimov.MyChat.Server.Controllers
 
         // api/users
         [HttpPost]
+        [AllowAnonymous]
         public async Task<ActionResult<User>> CreateUser(User user)
         {
             if (string.IsNullOrEmpty(user.Name) || string.IsNullOrEmpty(user.Email) || string.IsNullOrEmpty(user.Password))
@@ -76,6 +83,7 @@ namespace Sulimov.MyChat.Server.Controllers
 
         // api/users/login
         [HttpPost("login")]
+        [AllowAnonymous]
         public async Task<ActionResult<AuthenticationResponse>> Login(AuthenticationRequest request)
         {
             if (!ModelState.IsValid)

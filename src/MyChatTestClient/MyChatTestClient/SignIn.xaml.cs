@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,6 +15,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Sulimov.MyChat.Client.Models;
 
 namespace Sulimov.MyChat.Client
 {
@@ -51,7 +53,7 @@ namespace Sulimov.MyChat.Client
 
             using var client = new HttpClient();
 
-            var response = await client.PostAsJsonAsync(Constants.ApiUrl + "users/login", data);
+            var response = await client.PostAsJsonAsync($"{Constants.ApiUrl}users/login", data);
             if (response.StatusCode != HttpStatusCode.OK)
             {
                 MessageBox.Show("Bad credentials");
@@ -66,6 +68,19 @@ namespace Sulimov.MyChat.Client
                 Password = this.PasswordTxtBox.Text,
                 Token = responseData.Token,
             };
+
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(Constants.AuthMethod, this.Credentials.Token);
+            var userResponse = await client.GetAsync($"{Constants.ApiUrl}users?login={data.Login}");
+
+            if (!userResponse.IsSuccessStatusCode)
+            {
+                MessageBox.Show("Problem with network...");
+                return;
+            }
+
+            var user = await userResponse.Content.ReadFromJsonAsync<User>();
+            this.Credentials.Id = user.Id;
+            this.Credentials.Email = user.Email;
 
             this.Close();
         }

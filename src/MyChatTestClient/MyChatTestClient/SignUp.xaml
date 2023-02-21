@@ -5,18 +5,18 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Sulimov.MyChat.Client"
         mc:Ignorable="d"
-        Title="Sign Up" Height="200" Width="400">
+        Title="Sign Up" Height="171" Width="400">
     <Grid>
-        <Label x:Name="LoginLabel" Content="Login:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="112" Height="28"/>
-        <Label x:Name="EmailLabel" Content="E-mail:" HorizontalAlignment="Left" Margin="10,43,0,0" VerticalAlignment="Top" Width="112" Height="28"/>
-        <Label x:Name="PasswordLabel" Content="Password:" HorizontalAlignment="Left" Margin="10,76,0,0" VerticalAlignment="Top" Width="112" Height="28"/>
-        <Label x:Name="ConfirmPasswordLabel" Content="Confirm password:" HorizontalAlignment="Left" Margin="10,109,0,0" VerticalAlignment="Top" Width="112" Height="28"/>
-        <TextBox x:Name="LoginTxtBox" HorizontalAlignment="Left" Margin="127,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="263" Height="28"/>
-        <TextBox x:Name="EmailTxtBox" HorizontalAlignment="Left" Margin="127,43,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="263" Height="28"/>
-        <TextBox x:Name="PasswordTxtBox" HorizontalAlignment="Left" Margin="127,76,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="263" Height="28"/>
-        <TextBox x:Name="PasswordConfirmTxtBox" HorizontalAlignment="Left" Margin="127,109,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="263" Height="28"/>
-        <Button x:Name="RegisterBtn" Content="Register" HorizontalAlignment="Left" Margin="127,157,0,0" VerticalAlignment="Top" Width="73" Height="20" Click="RegisterBtn_Click"/>
-        <Button x:Name="CancelBtn" Content="Cancel" HorizontalAlignment="Left" Margin="205,157,0,0" VerticalAlignment="Top" Width="73" Height="20" Click="CancelBtn_Click"/>
+        <Label x:Name="LoginLabel" Content="Login:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Height="18" Padding="0,0,0,0"/>
+        <Label x:Name="EmailLabel" Content="E-mail:" HorizontalAlignment="Left" Margin="10,33,0,0" VerticalAlignment="Top" Height="18" Padding="0,0,0,0"/>
+        <Label x:Name="PasswordLabel" Content="Password:" HorizontalAlignment="Left" Margin="10,56,0,0" VerticalAlignment="Top" Height="18" Padding="0,0,0,0"/>
+        <Label x:Name="ConfirmPasswordLabel" Content="Confirm password:" HorizontalAlignment="Left" Margin="10,79,0,0" VerticalAlignment="Top" Height="18" Padding="0,0,0,0"/>
+        <TextBox x:Name="LoginTxtBox" Margin="127,10,10,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="18"/>
+        <TextBox x:Name="EmailTxtBox" Margin="127,33,10,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="18"/>
+        <TextBox x:Name="PasswordTxtBox" Margin="127,56,10,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="18"/>
+        <TextBox x:Name="PasswordConfirmTxtBox" Margin="127,79,10,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="18"/>
+        <Button x:Name="RegisterBtn" Content="Register" HorizontalAlignment="Left" Margin="122,102,0,0" VerticalAlignment="Top" Width="73" Height="20" Click="RegisterBtn_Click"/>
+        <Button x:Name="CancelBtn" Content="Cancel" HorizontalAlignment="Left" Margin="200,102,0,0" VerticalAlignment="Top" Width="73" Height="20" Click="CancelBtn_Click"/>
 
     </Grid>
 </Window>

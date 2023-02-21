@@ -8,10 +8,17 @@ namespace Sulimov.MyChat.Server.BL.Services
     public interface IChateService
     {
         /// <summary>
-        /// Retur all users's chat.
+        /// Return all users's chat.
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
         Task<IEnumerable<Chat>> GetUserChats(string userId);
+
+        /// <summary>
+        /// Create new chat.
+        /// </summary>
+        /// <param name="chat">New chat</param>
+        /// <returns>New chat.</returns>
+        Task<Chat> CreateChat(Chat chat);
     }
 }

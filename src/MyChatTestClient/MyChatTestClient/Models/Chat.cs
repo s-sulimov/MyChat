@@ -2,13 +2,13 @@
 
 namespace Sulimov.MyChat.Client.Models
 {
-    internal class Chat
+    public class Chat
     {
         public int Id { get; set; }
 
         public string Title { get; set; }
 
-        public IEnumerable<User> Users { get; set; }
+        public List<User> Users { get; set; }
 
         public override string ToString()
         {

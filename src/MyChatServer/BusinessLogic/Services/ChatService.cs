@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Sulimov.MyChat.Server.BL.Models;
 using Sulimov.MyChat.Server.DAL;
+using Sulimov.MyChat.Server.DAL.Models;
 
 namespace Sulimov.MyChat.Server.BL.Services
 {
@@ -10,7 +11,7 @@ namespace Sulimov.MyChat.Server.BL.Services
 
         public ChatService(DataContext dataContext)
         {
-            this.dbContext = dataContext;
+            dbContext = dataContext;
         }
 
         public async Task<IEnumerable<Chat>> GetUserChats(string userId)
@@ -30,6 +31,37 @@ namespace Sulimov.MyChat.Server.BL.Services
                     })
                 })
                 .ToListAsync();
+        }
+
+        public async Task<Chat> CreateChat(Chat chat)
+        {
+            var ids = chat.Users.Select(s => s.Id).ToArray();
+            var dbUsers = await dbContext.Users.Where(w => ids.Contains(w.Id)).ToListAsync();
+            if (dbUsers.Count < chat.Users.Count())
+            {
+                return null;
+            }
+
+            var dbChat = new DbChat
+            {
+                Title = chat.Title,
+                Users = dbUsers,
+            };
+
+            dbContext.Add(dbChat);
+            await dbContext.SaveChangesAsync();
+
+            return new Chat
+            {
+                Id = dbChat.Id,
+                Title = dbChat.Title,
+                Users = dbChat.Users.Select(s => new User
+                {
+                    Id = s.Id,
+                    Name = s.UserName,
+                    Email = s.Email,
+                }),
+            };
         }
     }
 }

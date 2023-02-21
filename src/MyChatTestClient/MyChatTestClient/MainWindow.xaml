@@ -7,11 +7,13 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        <Label x:Name="UserLabel" Content="Please sign in" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0" Width="189" Height="30" />
-        <Button x:Name="SignUp" Content="Sign Up" Click="SignUp_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="204,10,0,0" Width="60" Height="30"/>
-        <Button x:Name="SignIn" Content="Sign In" Click="SignIn_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="269,10,0,0" Width="60" Height="30"/>
-        <Grid HorizontalAlignment="Center" Height="379" Margin="0,45,0,0" VerticalAlignment="Top" Width="780">
-            <ListBox x:Name="ChatList" d:ItemsSource="{d:SampleData ItemCount=5}" Margin="0,0,605,0"/>
-        </Grid>
+        <Label x:Name="UserLabel" Content="Please sign in" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,10,0,0" Height="30" />
+        <Button x:Name="SignUp" Content="Sign Up" Click="SignUp_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="180,10,0,0" Width="60" Height="30"/>
+        <Button x:Name="SignIn" Content="Sign In" Click="SignIn_Click" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="245,10,0,0" Width="60" Height="30"/>
+        <ListBox x:Name="ChatList" d:ItemsSource="{d:SampleData ItemCount=5}" SelectionChanged="ChatList_SelectionChanged" HorizontalAlignment="Left" Width="165" Margin="10,45,0,10"/>
+        <ListBox x:Name="MessagesList" d:ItemsSource="{d:SampleData ItemCount=5}" Margin="180,45,10,49"/>
+        <Button x:Name="SendBtn" Content="Send" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom" Height="34" Width="54" Click="SendBtn_Click"/>
+        <TextBox x:Name="MessageTxtBox" Margin="180,0,69,10" TextWrapping="Wrap" VerticalAlignment="Bottom" Height="34" Background="#FF9AEF9F" BorderBrush="#FF151517"/>
+        <Button x:Name="CreateChatBtn" Content="New Chat" HorizontalAlignment="Left" Margin="310,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.252,-0.349" Height="30" Width="60" Click="CreateChatBtn_Click"/>
     </Grid>
 </Window>
