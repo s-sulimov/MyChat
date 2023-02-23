@@ -33,4 +33,5 @@ stages:
         command: push
         containerRegistry: MyDockerHub
         repository: slim1985/my-chat-server
-        tags: latest
+        tags: |
+          $(tag)
