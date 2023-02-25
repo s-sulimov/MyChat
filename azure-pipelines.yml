@@ -23,4 +23,6 @@ stages:
         command: 'buildAndPush'
         Dockerfile: '$(Build.SourcesDirectory)/src/MyChatServer/Dockerfile'
         buildContext: '$(Build.SourcesDirectory)/src/MyChatServer'
-        tags: '$(tag)'
+        tags: |
+          '$(tag)'
+          'latest'
