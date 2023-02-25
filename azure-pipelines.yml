@@ -19,22 +19,8 @@ stages:
     - task: Docker@2
       inputs:
         containerRegistry: 'MyDockerHub'
-        repository: 'my-chat-server'
+        repository: 'slim1985/my-chat-server'
         command: 'buildAndPush'
         Dockerfile: '$(Build.SourcesDirectory)/src/MyChatServer/Dockerfile'
         buildContext: '$(Build.SourcesDirectory)/src/MyChatServer'
         tags: '$(tag)'
-    # - task: Docker@2
-    #   displayName: Build an image
-    #   inputs:
-    #     command: build
-    #     dockerfile: '$(Build.SourcesDirectory)/src/MyChatServer/Dockerfile'
-    #     tags: |
-    #       $(tag)
-    # - task: Docker@2
-    #   displayName: Push an image
-    #   inputs:
-    #     containerRegistry: 'MyDockerHub'
-    #     repository: 'my-chat-server'
-    #     command: 'push'
-    #     tags: '$(tag)'
