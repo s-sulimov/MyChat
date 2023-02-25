@@ -23,3 +23,10 @@ stages:
         dockerfile: '$(Build.SourcesDirectory)/src/MyChatServer/Dockerfile'
         tags: |
           $(tag)
+    - task: Docker@2
+      displayName: Push an image
+      inputs:
+        containerRegistry: 'MyDockerHub'
+        repository: 'my-chat-server'
+        command: 'push'
+        tags: '$(tag)'
