@@ -24,5 +24,5 @@ stages:
         Dockerfile: '$(Build.SourcesDirectory)/src/MyChatServer/Dockerfile'
         buildContext: '$(Build.SourcesDirectory)/src/MyChatServer'
         tags: |
-          '$(tag)'
-          'latest'
+          $(tag)
+          latest
