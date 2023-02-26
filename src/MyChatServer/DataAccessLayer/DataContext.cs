@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Sulimov.MyChat.Server.Core;
 using Sulimov.MyChat.Server.DAL.Models;
 
 namespace Sulimov.MyChat.Server.DAL
@@ -9,6 +10,7 @@ namespace Sulimov.MyChat.Server.DAL
     {
         public DbSet<DbMessage> Messages { get; set; }
         public DbSet<DbChat> Chats { get; set; }
+        public DbSet<DbChatRole> ChatRoles { get; set; }
 
         public DataContext(DbContextOptions<DataContext> options)
             : base(options) { }
@@ -21,13 +23,32 @@ namespace Sulimov.MyChat.Server.DAL
             {
                 new IdentityRole
                 {
-                    Name = "Admin",
-                    NormalizedName = "Admin",
+                    Name = Constants.IdentityAdminRoleName,
+                    NormalizedName = Constants.IdentityAdminRoleName,
                 },
                 new IdentityRole
                 {
-                    Name = "User",
-                    NormalizedName = "User",
+                    Name = Constants.IdentityUserRoleName,
+                    NormalizedName = Constants.IdentityUserRoleName,
+                },
+            });
+
+            modelBuilder.Entity<DbChatRole>().HasData(new DbChatRole[]
+            {
+                new DbChatRole
+                {
+                    Id = 1,
+                    Name = Constants.ChatOwnerRoleName,
+                },
+                new DbChatRole
+                {
+                    Id = 2,
+                    Name = Constants.ChatAdminRoleName,
+                },
+                new DbChatRole
+                {
+                    Id = 3,
+                    Name = Constants.ChatUserRoleName,
                 },
             });
         }

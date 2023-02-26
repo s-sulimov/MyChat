@@ -63,6 +63,8 @@ namespace Sulimov.MyChat.Server
             services.AddScoped<IChateService, ChatService>();
             services.AddScoped<IJwtService, JwtService>();
 
+            services.AddSwaggerGen();
+
             services.AddControllers()
                 .AddNewtonsoftJson();
         }
@@ -72,6 +74,8 @@ namespace Sulimov.MyChat.Server
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseSwagger();
+                app.UseSwaggerUI();
             }
 
             app.UseHttpLogging();

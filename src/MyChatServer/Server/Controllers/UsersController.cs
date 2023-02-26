@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Sulimov.MyChat.Server.BL.Models;
+using Sulimov.MyChat.Server.Core;
 using Sulimov.MyChat.Server.DAL.Models;
 using Sulimov.MyChat.Server.Services;
 using System.Data;
@@ -72,7 +72,7 @@ namespace Sulimov.MyChat.Server.Controllers
             }
 
             var DbUser = await userManager.FindByNameAsync(user.Name);
-            result = await userManager.AddToRoleAsync(DbUser, "User");
+            result = await userManager.AddToRoleAsync(DbUser, Constants.IdentityUserRoleName);
             if (!result.Succeeded)
             {
                 return BadRequest(result.Errors);

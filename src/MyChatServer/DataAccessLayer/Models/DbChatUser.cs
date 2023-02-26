@@ -1,9 +1,9 @@
 ﻿namespace Sulimov.MyChat.Server.DAL.Models
 {
     /// <summary>
-    /// Chat data model.
+    /// Collection item for chat user.
     /// </summary>
-    public class DbChat
+    public class DbChatUser
     {
         /// <summary>
         /// Identifier.
@@ -11,13 +11,13 @@
         public int Id { get; set; }
         
         /// <summary>
-        /// Chat title.
+        /// Chat user.
         /// </summary>
-        public string Title { get; set; }
+        public DbUser User { get; set; }
         
         /// <summary>
-        /// Chat users and roles.
+        /// User role.
         /// </summary>
-        public List<DbChatUser> Users { get; set; }
+        public DbChatRole Role { get; set; }
     }
 }

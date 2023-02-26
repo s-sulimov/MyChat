@@ -1,23 +1,23 @@
 ﻿namespace Sulimov.MyChat.Server.BL.Models
 {
     /// <summary>
-    /// DTO for chat.
+    /// Collection item for chat user.
     /// </summary>
-    public class Chat
+    public class ChatUser
     {
         /// <summary>
-        /// Chat ID.
+        /// Identifier.
         /// </summary>
         public int Id { get; set; }
-        
+
         /// <summary>
-        /// Chat title.
+        /// Chat user.
         /// </summary>
-        public string Title { get; set; }
-        
+        public User User { get; set; }
+
         /// <summary>
-        /// Chat users.
+        /// User role.
         /// </summary>
-        public IEnumerable<ChatUser> Users { get; set; }
+        public ChatRole Role { get; set; }
     }
 }

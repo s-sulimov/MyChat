@@ -36,13 +36,75 @@ namespace Sulimov.MyChat.Server.Controllers
                 return BadRequest();
             }
 
-            Chat newChat = await this.chateService.CreateChat(chat);
+            var userId = this.httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            Chat newChat = await this.chateService.CreateChat(chat, userId);
+
             if (newChat == null)
             {
                 return BadRequest();
             }
 
             return Ok(newChat);
+        }
+
+        [HttpPut("add-user")]
+        public async Task<IActionResult> AddUserToChat(int chatId, string userId)
+        {
+            var actualUserId = this.httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            var chat = await this.chateService.AddUserToChat(chatId, actualUserId, userId);
+
+            if (chat == null)
+            {
+                return BadRequest();
+            }
+
+            return Ok(chat);
+        }
+
+        [HttpPut("remove-user")]
+        public async Task<IActionResult> RemoveUserFromChat(int chatId, string userId)
+        {
+            var actualUserId = this.httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            var chat = await this.chateService.RemoveUserFromChat(chatId, actualUserId, userId);
+
+            if (chat == null)
+            {
+                return BadRequest();
+            }
+
+            return Ok(chat);
+        }
+
+        [HttpPut("set-admin")]
+        public async Task<IActionResult> SetChatAdmin(int chatId, string userId)
+        {
+            var actualUserId = this.httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            var chat = await this.chateService.SetChatAdmin(chatId, actualUserId, userId);
+
+            if (chat == null)
+            {
+                return BadRequest();
+            }
+
+            return Ok(chat);
+        }
+
+        [HttpPut("remove-admin")]
+        public async Task<IActionResult> RemoveChatAdmin(int chatId, string userId)
+        {
+            var actualUserId = this.httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            var chat = await this.chateService.RemoveChatAdmin(chatId, actualUserId, userId);
+
+            if (chat == null)
+            {
+                return BadRequest();
+            }
+
+            return Ok(chat);
         }
     }
 }

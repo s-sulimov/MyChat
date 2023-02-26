@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Sulimov.MyChat.Server.BL.Models;
+using Sulimov.MyChat.Server.Core;
 using Sulimov.MyChat.Server.DAL;
 using Sulimov.MyChat.Server.DAL.Models;
 
@@ -92,8 +93,8 @@ namespace Sulimov.MyChat.Server.BL.Services
         {
             var chat = await dbContext.Chats
                 .Where(w => w.Users.Count() == 2
-                    && w.Users.Any(a => a.Id == senderId)
-                    && w.Users.Any(a => a.Id == recepientId))
+                    && w.Users.Any(a => a.User.Id == senderId)
+                    && w.Users.Any(a => a.User.Id == recepientId))
                 .FirstOrDefaultAsync();
 
             if (chat != null)
@@ -103,6 +104,7 @@ namespace Sulimov.MyChat.Server.BL.Services
 
             var sender = await dbContext.Users.FirstOrDefaultAsync(f => f.Id == senderId);
             var recepient = await dbContext.Users.FirstOrDefaultAsync(f => f.Id == recepientId);
+            var roleOwner = await dbContext.ChatRoles.FirstOrDefaultAsync(f => f.Name == Constants.ChatOwnerRoleName);
 
             if (sender == null || recepient == null)
             {
@@ -112,10 +114,18 @@ namespace Sulimov.MyChat.Server.BL.Services
             var newChat = new DbChat
             {
                 Title = title,
-                Users = new List<DbUser> 
+                Users = new List<DbChatUser> 
                 {
-                    sender,
-                    recepient
+                    new DbChatUser
+                    {
+                        User = sender,
+                        Role = roleOwner,
+                    },
+                    new DbChatUser
+                    {
+                        User = recepient,
+                        Role = roleOwner,
+                    }
                 },
             };
 
