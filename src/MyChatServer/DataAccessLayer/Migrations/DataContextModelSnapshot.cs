@@ -51,15 +51,15 @@ namespace Sulimov.MyChat.Server.DAL.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "bf0c4574-b76f-45bd-9c3e-7891ef576147",
-                            ConcurrencyStamp = "4b37a9cf-9e35-4ea9-af55-4a8dc689390d",
+                            Id = "7f1d49b7-08cd-45da-8116-bb0655e28167",
+                            ConcurrencyStamp = "bde846a2-7e77-46c1-8152-fefdcb542468",
                             Name = "Admin",
                             NormalizedName = "Admin"
                         },
                         new
                         {
-                            Id = "37795a80-da6a-4dea-9217-d9d3d2da38a5",
-                            ConcurrencyStamp = "87922471-6e17-445c-b246-2cec40c5f5c0",
+                            Id = "f1e04048-15f7-4d24-99e8-934d32ff05f5",
+                            ConcurrencyStamp = "dde4f73a-e8c9-42fe-9a8d-9d38244795e6",
                             Name = "User",
                             NormalizedName = "User"
                         });
@@ -183,6 +183,7 @@ namespace Sulimov.MyChat.Server.DAL.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Title")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -201,6 +202,7 @@ namespace Sulimov.MyChat.Server.DAL.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -236,10 +238,11 @@ namespace Sulimov.MyChat.Server.DAL.Migrations
                     b.Property<int?>("DbChatId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("RoleId")
+                    b.Property<int>("RoleId")
                         .HasColumnType("int");
 
                     b.Property<string>("UserId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
@@ -268,9 +271,11 @@ namespace Sulimov.MyChat.Server.DAL.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("SenderId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Text")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -413,11 +418,15 @@ namespace Sulimov.MyChat.Server.DAL.Migrations
 
                     b.HasOne("Sulimov.MyChat.Server.DAL.Models.DbChatRole", "Role")
                         .WithMany()
-                        .HasForeignKey("RoleId");
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Sulimov.MyChat.Server.DAL.Models.DbUser", "User")
                         .WithMany()
-                        .HasForeignKey("UserId");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Role");
 
@@ -434,7 +443,9 @@ namespace Sulimov.MyChat.Server.DAL.Migrations
 
                     b.HasOne("Sulimov.MyChat.Server.DAL.Models.DbUser", "Sender")
                         .WithMany()
-                        .HasForeignKey("SenderId");
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Chat");
 

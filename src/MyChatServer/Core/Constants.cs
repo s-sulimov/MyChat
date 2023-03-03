@@ -29,5 +29,7 @@
         /// Chat user role name.
         /// </summary>
         public static string ChatUserRoleName = "User";
+
+        public static string UnknownErrorMessage = "Unknown error. Please, conntact with the support.";
     }
 }

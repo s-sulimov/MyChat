@@ -23,16 +23,16 @@
         /// <summary>
         /// Recepient ID.
         /// </summary>
-        public string RecepientId { get; set; }
+        public string RecepientId { get; set; } = string.Empty;
         
         /// <summary>
         /// Sender.
         /// </summary>
-        public User Sender { get; set; }
+        public User Sender { get; set; } = new User();
         
         /// <summary>
         /// Message text.
         /// </summary>
-        public string Text { get; set; }
+        public string Text { get; set; } = string.Empty;
     }
 }

@@ -8,15 +8,15 @@ namespace Sulimov.MyChat.Server.BL.Models
     public class AuthenticationRequest
     {
         /// <summary>
-        /// User login.
+        /// User login or email.
         /// </summary>
         [Required]
-        public string Login { get; set; }
+        public string Login { get; set; } = string.Empty;
 
         /// <summary>
         /// Password.
         /// </summary>
         [Required]
-        public string Password { get; set; }
+        public string Password { get; set; } = string.Empty;
     }
 }

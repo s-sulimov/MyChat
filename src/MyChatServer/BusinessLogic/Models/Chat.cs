@@ -18,6 +18,12 @@
         /// <summary>
         /// Chat users.
         /// </summary>
-        public IEnumerable<ChatUser> Users { get; set; }
+        public List<ChatUser> Users { get; set; }
+
+        public Chat()
+        {
+            Title = string.Empty;
+            Users = new List<ChatUser>();
+        }
     }
 }

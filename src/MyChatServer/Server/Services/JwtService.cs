@@ -32,11 +32,7 @@ namespace Sulimov.MyChat.Server.Services
 
             var tokenHandler = new JwtSecurityTokenHandler();
 
-            return new AuthenticationResponse
-            {
-                Token = tokenHandler.WriteToken(token),
-                Expiration = expiration
-            };
+            return new AuthenticationResponse(tokenHandler.WriteToken(token), expiration);
         }
 
         private JwtSecurityToken CreateJwtToken(Claim[] claims, SigningCredentials credentials, DateTime expiration) =>

@@ -185,26 +185,31 @@ namespace Sulimov.MyChat.Server.BL.Services
 
         private Chat CreateChatModel(DbChat dbChat)
         {
-            return new Chat
+            var chat = new Chat
             {
                 Id = dbChat.Id,
                 Title = dbChat.Title,
-                Users = dbChat.Users.Select(u => new ChatUser
-                {
-                    Id = u.Id,
-                    User = new User
-                    {
-                        Id = u.User.Id,
-                        Email = u.User.Email,
-                        Name = u.User.UserName,
-                    },
-                    Role = new ChatRole
-                    {
-                        Id = u.Role.Id,
-                        Name = u.Role.Name,
-                    },
-                })
             };
+
+            foreach (DbChatUser dbChatUser in dbChat.Users)
+            {
+                var user = new User
+                {
+                    Id = dbChatUser.User.Id,
+                    Name = dbChatUser.User.UserName,
+                    Email = dbChatUser.User.Email,
+                };
+
+                var role = new ChatRole
+                {
+                    Id = dbChatUser.Role.Id,
+                    Name = dbChatUser.Role.Name,
+                };
+
+                chat.Users.Add(new ChatUser(dbChatUser.Id, user, role));
+            }
+            
+            return chat;
         }
     }
 }

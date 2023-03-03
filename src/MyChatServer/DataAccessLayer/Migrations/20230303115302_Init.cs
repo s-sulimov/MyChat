@@ -49,16 +49,16 @@ namespace Sulimov.MyChat.Server.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Chats",
+                name: "ChatRoles",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Chats", x => x.Id);
+                    table.PrimaryKey("PK_ChatRoles", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -168,27 +168,54 @@ namespace Sulimov.MyChat.Server.DAL.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "DbChatDbUser",
+                name: "Chats",
                 columns: table => new
                 {
-                    ChatsId = table.Column<int>(type: "int", nullable: false),
-                    UsersId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DbUserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DbChatDbUser", x => new { x.ChatsId, x.UsersId });
+                    table.PrimaryKey("PK_Chats", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_DbChatDbUser_AspNetUsers_UsersId",
-                        column: x => x.UsersId,
+                        name: "FK_Chats_AspNetUsers_DbUserId",
+                        column: x => x.DbUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DbChatUser",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    RoleId = table.Column<int>(type: "int", nullable: false),
+                    DbChatId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DbChatUser", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_DbChatUser_AspNetUsers_UserId",
+                        column: x => x.UserId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_DbChatDbUser_Chats_ChatsId",
-                        column: x => x.ChatsId,
-                        principalTable: "Chats",
+                        name: "FK_DbChatUser_ChatRoles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "ChatRoles",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_DbChatUser_Chats_DbChatId",
+                        column: x => x.DbChatId,
+                        principalTable: "Chats",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -198,9 +225,9 @@ namespace Sulimov.MyChat.Server.DAL.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    SenderId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    SenderId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ChatId = table.Column<int>(type: "int", nullable: false),
-                    Text = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Text = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -209,7 +236,8 @@ namespace Sulimov.MyChat.Server.DAL.Migrations
                         name: "FK_Messages_AspNetUsers_SenderId",
                         column: x => x.SenderId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Messages_Chats_ChatId",
                         column: x => x.ChatId,
@@ -221,12 +249,21 @@ namespace Sulimov.MyChat.Server.DAL.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[] { "46257ec7-2114-41cb-8108-bc8617e0bf82", "1bc12428-62b3-429e-a716-1f54973b8ede", "User", null });
+                values: new object[,]
+                {
+                    { "7f1d49b7-08cd-45da-8116-bb0655e28167", "bde846a2-7e77-46c1-8152-fefdcb542468", "Admin", "Admin" },
+                    { "f1e04048-15f7-4d24-99e8-934d32ff05f5", "dde4f73a-e8c9-42fe-9a8d-9d38244795e6", "User", "User" }
+                });
 
             migrationBuilder.InsertData(
-                table: "AspNetRoles",
-                columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[] { "8197ed2c-3d52-4c72-b902-7cae19ee7b4e", "2af041ce-a2fd-48e0-b374-5e3440c96b6d", "Admin", null });
+                table: "ChatRoles",
+                columns: new[] { "Id", "Name" },
+                values: new object[,]
+                {
+                    { 1, "Owner" },
+                    { 2, "Admin" },
+                    { 3, "User" }
+                });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -268,9 +305,24 @@ namespace Sulimov.MyChat.Server.DAL.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_DbChatDbUser_UsersId",
-                table: "DbChatDbUser",
-                column: "UsersId");
+                name: "IX_Chats_DbUserId",
+                table: "Chats",
+                column: "DbUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DbChatUser_DbChatId",
+                table: "DbChatUser",
+                column: "DbChatId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DbChatUser_RoleId",
+                table: "DbChatUser",
+                column: "RoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DbChatUser_UserId",
+                table: "DbChatUser",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Messages_ChatId",
@@ -301,7 +353,7 @@ namespace Sulimov.MyChat.Server.DAL.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "DbChatDbUser");
+                name: "DbChatUser");
 
             migrationBuilder.DropTable(
                 name: "Messages");
@@ -310,10 +362,13 @@ namespace Sulimov.MyChat.Server.DAL.Migrations
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
+                name: "ChatRoles");
 
             migrationBuilder.DropTable(
                 name: "Chats");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUsers");
         }
     }
 }

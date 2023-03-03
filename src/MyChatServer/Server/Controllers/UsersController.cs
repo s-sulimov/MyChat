@@ -1,11 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Sulimov.MyChat.Server.BL.Models;
-using Sulimov.MyChat.Server.Core;
-using Sulimov.MyChat.Server.DAL.Models;
 using Sulimov.MyChat.Server.Services;
-using System.Data;
 using System.Security.Claims;
 
 namespace Sulimov.MyChat.Server.Controllers
@@ -15,70 +11,37 @@ namespace Sulimov.MyChat.Server.Controllers
     [Authorize]
     public class UsersController : ControllerBase
     {
-        private readonly UserManager<DbUser> userManager;
-        private readonly SignInManager<DbUser> signInManager;
-        private readonly IJwtService jwtService;
+        private readonly IUserService userService;
+        private readonly IHttpContextAccessor httpContextAccessor;
 
-        public UsersController(UserManager<DbUser> userManager,
-            IJwtService jwtService,
-            SignInManager<DbUser> signInManager)
+        public UsersController(IUserService userService, IHttpContextAccessor httpContextAccessor)
         {
-            this.userManager = userManager;
-            this.jwtService = jwtService;
-            this.signInManager = signInManager;
+            this.userService = userService;
+            this.httpContextAccessor = httpContextAccessor;
         }
 
         // api/users
         [HttpGet]
-        public async Task<ActionResult<User>> GetUser(string login)
+        public async Task<ActionResult<User>> GetUser(string name)
         {
-            DbUser user = await userManager.FindByNameAsync(login);
+            var result = await userService.GetUser(name);
 
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            return new User
-            {
-                Id = user.Id,
-                Name = user.UserName,
-                Email = user.Email
-            };
+            return ResultHelper.CreateHttpResult(result, this);
         }
 
-        // api/users
-        [HttpPost]
+        // api/users/create
+        [HttpPost("create")]
         [AllowAnonymous]
-        public async Task<ActionResult<User>> CreateUser(User user)
+        public async Task<ActionResult<User>> CreateUser(CreateUserRequest request)
         {
-            if (string.IsNullOrEmpty(user.Name) || string.IsNullOrEmpty(user.Email) || string.IsNullOrEmpty(user.Password))
+            if (!ModelState.IsValid)
             {
                 return BadRequest();
             }
 
-            var result = await userManager.CreateAsync(
-                new DbUser()
-                {
-                    UserName = user.Name,
-                    Email = user.Email,
-                },
-                user.Password
-            );
+            var result = await userService.CreateUser(request.Name, request.Email, request.Password);
 
-            if (!result.Succeeded)
-            {
-                return BadRequest(result.Errors);
-            }
-
-            var DbUser = await userManager.FindByNameAsync(user.Name);
-            result = await userManager.AddToRoleAsync(DbUser, Constants.IdentityUserRoleName);
-            if (!result.Succeeded)
-            {
-                return BadRequest(result.Errors);
-            }
-
-            return CreatedAtAction("GetUser", new { login = user.Name }, user);
+            return ResultHelper.CreateHttpResult(result, this);
         }
 
         // api/users/login
@@ -88,27 +51,42 @@ namespace Sulimov.MyChat.Server.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest("Bad credentials");
+                return BadRequest();
             }
 
-            var user = await userManager.FindByNameAsync(request.Login);
+            var result = await userService.Login(request.Login, request.Password);
 
-            if (user == null)
+            return ResultHelper.CreateHttpResult(result, this);
+        }
+
+        // api/users/change-email
+        [HttpPatch("change-email")]
+        public async Task<ActionResult<User>> ChangeEmail(ChangeUserEmailRequest request)
+        {
+            if (!ModelState.IsValid)
             {
-                return BadRequest("Bad credentials");
+                return BadRequest();
             }
 
-            var result = await signInManager.CheckPasswordSignInAsync(user, request.Password, false);
-            if (!result.Succeeded)
+            var userId = httpContextAccessor?.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
+            var result = await userService.ChangeEmail(userId, request.Password, request.Email);
+
+            return ResultHelper.CreateHttpResult(result, this);
+        }
+
+        // api/users/change-password
+        [HttpPatch("change-password")]
+        public async Task<ActionResult<User>> ChangePassword(ChangeUserPasswordRequest request)
+        {
+            if (!ModelState.IsValid)
             {
-                return BadRequest("Bad credentials");
+                return BadRequest();
             }
 
-            var userRoles = await userManager.GetRolesAsync(user);
+            var userId = httpContextAccessor?.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
+            var result = await userService.ChangePassword(userId, request.CurrentPassword, request.NewPassword);
 
-            var token = jwtService.CreateToken(user, userRoles.Select(s => new Claim(ClaimTypes.Role, s)));
-
-            return Ok(token);
+            return ResultHelper.CreateHttpResult(result, this);
         }
     }
 }

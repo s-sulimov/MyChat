@@ -36,6 +36,7 @@ namespace Sulimov.MyChat.Server
                     options.Password.RequireLowercase = false;
                 })
                 .AddRoles<IdentityRole>()
+                .AddDefaultTokenProviders()
                 .AddSignInManager()
                 .AddEntityFrameworkStores<DataContext>();
 
@@ -62,6 +63,7 @@ namespace Sulimov.MyChat.Server
             services.AddScoped<IMessageService, MessageService>();
             services.AddScoped<IChateService, ChatService>();
             services.AddScoped<IJwtService, JwtService>();
+            services.AddScoped<IUserService, UserService>();
 
             services.AddSwaggerGen();
 

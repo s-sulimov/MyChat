@@ -5,6 +5,8 @@
     /// </summary>
     public class AuthenticationResponse
     {
+        public static AuthenticationResponse Instance { get; } = new AuthenticationResponse(string.Empty, default);
+        
         /// <summary>
         /// JWT token.
         /// </summary>
@@ -14,5 +16,11 @@
         /// Token expiration date and time.
         /// </summary>
         public DateTime Expiration { get; set; }
+
+        public AuthenticationResponse(string token, DateTime expirationDate)
+        {
+            Token = token;
+            Expiration = expirationDate;
+        }
     }
 }

@@ -19,5 +19,12 @@
         /// User role.
         /// </summary>
         public ChatRole Role { get; set; }
+
+        public ChatUser(int id, User user, ChatRole role)
+        {
+            Id = id;
+            User = user;
+            Role = role;
+        }
     }
 }
