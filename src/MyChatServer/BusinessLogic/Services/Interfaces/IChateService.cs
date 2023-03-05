@@ -58,5 +58,13 @@ namespace Sulimov.MyChat.Server.BL.Services
         /// <param name="userId">User ID.</param>
         /// <returns>Result that contains the chat.</returns>
         Task<Result<Chat>> RemoveChatAdmin(int chatId, string currentUserId, string userId);
+
+        /// <summary>
+        /// Get all chat's users.
+        /// </summary>
+        /// <param name="chatId">Chat ID.</param>
+        /// <param name="excludeUserId">Excluded user ID.</param>
+        /// <returns>All chat's users.</returns>
+        Task<IEnumerable<string>> GetChatUsers(int chatId, string excludeUserId);
     }
 }

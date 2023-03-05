@@ -49,7 +49,7 @@ namespace Sulimov.MyChat.Server.BL.Services
             return new Result<Message>(ResultStatus.Success, CreateMessageDto(dbModel), string.Empty);
         }
 
-        private Message CreateMessageDto(DbMessage dbMessage)
+        private static Message CreateMessageDto(DbMessage dbMessage)
         {
             return new Message
             {

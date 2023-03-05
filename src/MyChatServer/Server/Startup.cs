@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using Sulimov.MyChat.Server.BL.Services;
 using Sulimov.MyChat.Server.DAL;
 using Sulimov.MyChat.Server.DAL.Models;
+using Sulimov.MyChat.Server.Hubs;
 using Sulimov.MyChat.Server.Services;
 using System.Text;
 
@@ -66,6 +67,7 @@ namespace Sulimov.MyChat.Server
             services.AddScoped<IUserService, UserService>();
 
             services.AddSwaggerGen();
+            services.AddSignalR();
 
             services.AddControllers()
                 .AddNewtonsoftJson();
@@ -88,6 +90,7 @@ namespace Sulimov.MyChat.Server
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<ChatHub>("/chat-hub");
             });
         }
     }

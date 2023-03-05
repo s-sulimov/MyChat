@@ -21,6 +21,11 @@
         /// </summary>
         public string Message { get; set; }
 
+        /// <summary>
+        /// Success result.
+        /// </summary>
+        public bool IsSuccess => Status == ResultStatus.Success;
+
         public Result(ResultStatus status, T data, string message)
         {
             Status = status;

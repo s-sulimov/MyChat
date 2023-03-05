@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Sulimov.MyChat.Server.BL.Models;
 using Sulimov.MyChat.Server.BL.Models.Requests;
 using Sulimov.MyChat.Server.BL.Services;
+using Sulimov.MyChat.Server.Hubs;
 using System.Security.Claims;
 
 namespace Sulimov.MyChat.Server.Controllers
@@ -14,11 +16,13 @@ namespace Sulimov.MyChat.Server.Controllers
     {
         private readonly IChateService chateService;
         private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly IHubContext<ChatHub> chatHubContext;
 
-        public ChatsController(IChateService chateService, IHttpContextAccessor httpContextAccessor)
+        public ChatsController(IChateService chateService, IHttpContextAccessor httpContextAccessor, IHubContext<ChatHub> chatHubContext)
         {
             this.chateService = chateService;
             this.httpContextAccessor = httpContextAccessor;
+            this.chatHubContext = chatHubContext;
         }
 
         // api/chats
@@ -40,8 +44,10 @@ namespace Sulimov.MyChat.Server.Controllers
                 return BadRequest();
             }
 
-            var userId = this.httpContextAccessor?.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
-            var result = await this.chateService.CreateChat(request, userId);
+            var currentUserId = this.httpContextAccessor?.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
+            var result = await this.chateService.CreateChat(request, currentUserId);
+
+            await SendResult(result, currentUserId);
 
             return ResultHelper.CreateHttpResult(result, this);
         }
@@ -58,6 +64,8 @@ namespace Sulimov.MyChat.Server.Controllers
             var currentUserId = this.httpContextAccessor?.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
             var result = await this.chateService.AddUserToChat(request.ChatId, currentUserId, request.UserId);
 
+            await SendResult(result, currentUserId);
+
             return ResultHelper.CreateHttpResult(result, this);
         }
 
@@ -72,6 +80,8 @@ namespace Sulimov.MyChat.Server.Controllers
 
             var currentUserId = this.httpContextAccessor?.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
             var result = await this.chateService.RemoveUserFromChat(request.ChatId, currentUserId, request.UserId);
+
+            await SendResult(result, currentUserId);
 
             return ResultHelper.CreateHttpResult(result, this);
         }
@@ -88,6 +98,8 @@ namespace Sulimov.MyChat.Server.Controllers
             var currentUserId = this.httpContextAccessor?.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
             var result = await this.chateService.SetChatAdmin(request.ChatId, currentUserId, request.UserId);
 
+            await SendResult(result, currentUserId);
+
             return ResultHelper.CreateHttpResult(result, this);
         }
 
@@ -103,7 +115,22 @@ namespace Sulimov.MyChat.Server.Controllers
             var currentUserId = this.httpContextAccessor?.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
             var result = await this.chateService.RemoveChatAdmin(request.ChatId, currentUserId, request.UserId);
 
+            await SendResult(result, currentUserId);
+
             return ResultHelper.CreateHttpResult(result, this);
+        }
+
+        private async Task SendResult(Result<Chat> result, string currentUserId)
+        {
+            if (result.IsSuccess)
+            {
+                var users = result.Data.Users
+                    .Where(w => w.User.Id != currentUserId)
+                    .Select(s => s.User.Id)
+                    .ToArray();
+
+                await chatHubContext.Clients.Clients(users).SendAsync("chat", result.Data);
+            }
         }
     }
 }

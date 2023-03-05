@@ -264,7 +264,25 @@ namespace Sulimov.MyChat.Server.BL.Services
             return new Result<Chat>(ResultStatus.Success, CreateChatModel(chat), string.Empty);
         }
 
-        private Chat CreateChatModel(DbChat dbChat)
+        public async Task<IEnumerable<string>> GetChatUsers(int chatId, string excludeUserId)
+        {
+            var chat = await dbContext.Chats
+                .Include(i => i.Users)
+                    .ThenInclude(t => t.User)
+                .FirstOrDefaultAsync(f => f.Id == chatId);
+
+            if (chat == null)
+            {
+                return new string[0];
+            }
+            
+            return chat.Users
+                .Where(w => w.User.Id != excludeUserId)
+                .Select(s => s.User.Id)
+                .ToArray();
+        }
+
+        private static Chat CreateChatModel(DbChat dbChat)
         {
             var chat = new Chat
             {
