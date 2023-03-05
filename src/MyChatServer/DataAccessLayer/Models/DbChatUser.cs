@@ -13,11 +13,11 @@
         /// <summary>
         /// Chat user.
         /// </summary>
-        public DbUser User { get; set; }
+        public DbUser User { get; set; } = new DbUser();
         
         /// <summary>
         /// User role.
         /// </summary>
-        public DbChatRole Role { get; set; }
+        public DbChatRole Role { get; set; } = new DbChatRole();
     }
 }

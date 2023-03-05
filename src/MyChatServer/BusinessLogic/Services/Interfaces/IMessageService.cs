@@ -8,18 +8,19 @@ namespace Sulimov.MyChat.Server.BL.Services
     public interface IMessageService
     {
         /// <summary>
-        /// Save message.
+        /// Save new message.
         /// </summary>
-        /// <param name="message">Message.</param>
-        /// /// <param name="senderId">Sender ID.</param>
-        /// <returns>Saved message.</returns>
-        public Task<Message> SaveMessage(Message message, string senderId);
+        /// <param name="senderId">Sender ID.</param>
+        /// <param name="chatId">Chat ID.</param>
+        /// <param name="message">Message text.</param>
+        /// <returns>Result that contains saved message.</returns>
+        public Task<Result<Message>> SaveMessage(string senderId, int chatId, string message);
  
         /// <summary>
         /// Get all message from chat.
         /// </summary>
         /// <param name="chatId">Chat ID.</param>
-        /// <returns>List of messages.</returns>
-        public Task<Message[]> GetAllChatMessages(int chatId);
+        /// <returns>Result that contains list of messages.</returns>
+        public Task<Result<IEnumerable<Message>>> GetAllChatMessages(int chatId);
     }
 }

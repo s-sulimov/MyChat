@@ -13,11 +13,11 @@
         /// <summary>
         /// Chat title.
         /// </summary>
-        public string Title { get; set; }
+        public string Title { get; set; } = string.Empty;
         
         /// <summary>
         /// Chat users and roles.
         /// </summary>
-        public List<DbChatUser> Users { get; set; }
+        public List<DbChatUser> Users { get; set; } = new List<DbChatUser>();
     }
 }

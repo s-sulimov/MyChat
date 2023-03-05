@@ -19,6 +19,8 @@ namespace Sulimov.MyChat.Server
         /// <exception cref="InvalidEnumArgumentException"></exception>
         public static ActionResult<T> CreateHttpResult<T>(Result<T> serviceResult, ControllerBase controller)
         {
+            controller.HttpContext.Response.ContentType = "application/json";
+            
             switch (serviceResult.Status)
             {
                 case ResultStatus.Success:
@@ -27,6 +29,10 @@ namespace Sulimov.MyChat.Server
                     return controller.BadRequest(serviceResult.Message);
                 case ResultStatus.NotFound:
                     return controller.NotFound(serviceResult.Message);
+                case ResultStatus.Forbidden:
+                    return controller.Forbid(serviceResult.Message);
+                case ResultStatus.InternalError:
+                    return controller.StatusCode(500, serviceResult.Message);
                 default:
                     throw new InvalidEnumArgumentException();
             }

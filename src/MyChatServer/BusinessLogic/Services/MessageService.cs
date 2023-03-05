@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Sulimov.MyChat.Server.BL.Models;
-using Sulimov.MyChat.Server.Core;
 using Sulimov.MyChat.Server.DAL;
 using Sulimov.MyChat.Server.DAL.Models;
 
@@ -17,41 +16,23 @@ namespace Sulimov.MyChat.Server.BL.Services
         }
 
         /// <inheritdoc/>
-        public Task<Message[]> GetAllChatMessages(int chatId)
+        public async Task<Result<IEnumerable<Message>>> GetAllChatMessages(int chatId)
         {
-            return dbContext.Messages
+            var messages = await dbContext.Messages
                 .Where(w => w.ChatId == chatId)
-                .Select(s => new Message
-                {
-                    Id = s.Id,
-                    ChatId = chatId,
-                    Date = s.Date,
-                    Text = s.Text,
-                    Sender = new User
-                    {
-                        Name = s.Sender.UserName,
-                        Email = s.Sender.Email,
-                    },
-                })
+                .Select(s => CreateMessageDto(s))
                 .ToArrayAsync();
+            
+            return new Result<IEnumerable<Message>>(ResultStatus.Success, messages, string.Empty);
         }
 
         /// <inheritdoc/>
-        public async Task<Message> SaveMessage(Message message, string senderId)
+        public async Task<Result<Message>> SaveMessage(string senderId, int chatId, string message)
         {
-            DbChat chat = null;
-            if (message.ChatId != 0)
-            {
-                chat = await dbContext.Chats.FirstOrDefaultAsync(f => f.Id == message.ChatId);
-            }
-            else
-            {
-                chat = await GetPrivateChat(senderId, message.RecepientId, null);
-            }
-
+            var chat = await dbContext.Chats.FirstOrDefaultAsync(f => f.Id == chatId);
             if (chat == null)
             {
-                return null;
+                return new Result<Message>(ResultStatus.NotFound, Message.Instance, "Chat not found.");
             }
             
             var dbModel = new DbMessage
@@ -59,80 +40,30 @@ namespace Sulimov.MyChat.Server.BL.Services
                 SenderId = senderId,
                 ChatId = chat.Id,
                 Date = DateTime.UtcNow,
-                Text = message.Text,
+                Text = message,
             };
 
             dbContext.Messages.Add(dbModel);
             await dbContext.SaveChangesAsync();
 
-            dbModel = await dbContext.Messages.Include(i => i.Sender).FirstOrDefaultAsync(f => f.Id == dbModel.Id);
-
-            return new Message
-            {
-                Id = dbModel.Id,
-                ChatId = dbModel.Id,
-                Date = dbModel.Date,
-                Sender = new User
-                {
-                    Id = dbModel.Sender.Id,
-                    Name = dbModel.Sender.UserName,
-                    Email = dbModel.Sender.Email,
-                },
-                Text = dbModel.Text,
-            };
+            return new Result<Message>(ResultStatus.Success, CreateMessageDto(dbModel), string.Empty);
         }
 
-        /// <summary>
-        /// Create or get chat.
-        /// </summary>
-        /// <param name="senderId">Sender ID.</param>
-        /// <param name="recepientId">Recepient ID.</param>
-        /// <param name="title">Chat title.</param>
-        /// <returns></returns>
-        private async Task<DbChat> GetPrivateChat(string senderId, string recepientId, string title)
+        private Message CreateMessageDto(DbMessage dbMessage)
         {
-            var chat = await dbContext.Chats
-                .Where(w => w.Users.Count() == 2
-                    && w.Users.Any(a => a.User.Id == senderId)
-                    && w.Users.Any(a => a.User.Id == recepientId))
-                .FirstOrDefaultAsync();
-
-            if (chat != null)
+            return new Message
             {
-                return chat;
-            }
-
-            var sender = await dbContext.Users.FirstOrDefaultAsync(f => f.Id == senderId);
-            var recepient = await dbContext.Users.FirstOrDefaultAsync(f => f.Id == recepientId);
-            var roleOwner = await dbContext.ChatRoles.FirstOrDefaultAsync(f => f.Name == Constants.ChatOwnerRoleName);
-
-            if (sender == null || recepient == null)
-            {
-                return null;
-            }
-
-            var newChat = new DbChat
-            {
-                Title = title,
-                Users = new List<DbChatUser> 
+                Id = dbMessage.Id,
+                ChatId = dbMessage.Id,
+                Date = dbMessage.Date,
+                Sender = new User
                 {
-                    new DbChatUser
-                    {
-                        User = sender,
-                        Role = roleOwner,
-                    },
-                    new DbChatUser
-                    {
-                        User = recepient,
-                        Role = roleOwner,
-                    }
+                    Id = dbMessage.Sender.Id,
+                    Name = dbMessage.Sender.UserName,
+                    Email = dbMessage.Sender.Email,
                 },
+                Text = dbMessage.Text,
             };
-
-            dbContext.Chats.Add(newChat);
-            await dbContext.SaveChangesAsync();
-
-            return newChat;
         }
     }
 }

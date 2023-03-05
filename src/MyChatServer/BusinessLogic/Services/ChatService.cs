@@ -1,8 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Sulimov.MyChat.Server.BL.Models;
+using Sulimov.MyChat.Server.BL.Models.Requests;
 using Sulimov.MyChat.Server.Core;
 using Sulimov.MyChat.Server.DAL;
 using Sulimov.MyChat.Server.DAL.Models;
+using System.Text;
 
 namespace Sulimov.MyChat.Server.BL.Services
 {
@@ -17,28 +19,47 @@ namespace Sulimov.MyChat.Server.BL.Services
         }
 
         /// <inheritdoc/>
-        public async Task<IEnumerable<Chat>> GetUserChats(string userId)
+        public async Task<Result<IEnumerable<Chat>>> GetUserChats(string userId)
         {
-            return await dbContext.Chats
+            var result = await dbContext.Chats
                 .Include(i => i.Users)
                     .ThenInclude(t => t.User)
                 .Include(i => i.Users)
                     .ThenInclude(t => t.Role)
                 .Where(w => w.Users.Any(a => a.User.Id == userId))
                 .Select(s => CreateChatModel(s))
-                .ToListAsync();
+                .ToArrayAsync();
+
+
+            return new Result<IEnumerable<Chat>>(ResultStatus.Success, result, string.Empty);
         }
 
         /// <inheritdoc/>
-        public async Task<Chat> CreateChat(Chat chat, string ownerId)
+        public async Task<Result<Chat>> CreateChat(CreateChatRequest chat, string ownerId)
         {
-            var ids = chat.Users.Select(s => s.User.Id).ToArray();
-            var dbRoles = await dbContext.ChatRoles.ToArrayAsync();
-            var dbUsers = await dbContext.Users.Where(w => ids.Contains(w.Id)).ToListAsync();
+            var dbUsers = await dbContext.Users
+                .Where(w => w.Id == ownerId || chat.ChatUserIds.Contains(w.Id))
+                .ToArrayAsync();
 
-            if (dbUsers.Count < chat.Users.Count())
+            var sb = new StringBuilder();
+
+            foreach (string userId in chat.ChatUserIds)
             {
-                return null;
+                if (dbUsers.Any(a => a.Id == userId))
+                {
+                    sb.AppendLine($"User {userId} not found.");
+                }
+            }
+
+            var dbOwner = dbUsers.FirstOrDefault(f => f.Id == ownerId);
+            if (dbOwner == null)
+            {
+                sb.AppendLine($"User {ownerId} not found.");
+            }
+
+            if (sb.Length > 0)
+            {
+                return new Result<Chat>(ResultStatus.NotFound, Chat.Instance, sb.ToString());
             }
 
             var dbChat = new DbChat
@@ -47,23 +68,36 @@ namespace Sulimov.MyChat.Server.BL.Services
                 Users = new List<DbChatUser>(),
             };
 
-            foreach (ChatUser chatUser in chat.Users)
+            var roleOwner = await dbContext.ChatRoles.FirstOrDefaultAsync(f => f.Name == Constants.ChatOwnerRoleName);
+            var roleUser = await dbContext.ChatRoles.FirstOrDefaultAsync(f => f.Name == Constants.ChatUserRoleName);
+            if (roleOwner == null || roleUser == null)
             {
-                var role = chatUser.User.Id != ownerId
-                    ? dbRoles.Where(w => w.Name == Constants.ChatUserRoleName).FirstOrDefault()
-                    : dbRoles.Where(w => w.Name == Constants.ChatOwnerRoleName).FirstOrDefault();
+                return new Result<Chat>(ResultStatus.InternalError, Chat.Instance, Constants.UnknownErrorMessage);
+            }
 
-                var user = dbUsers.Where(w => w.Id == chatUser.User.Id).FirstOrDefault();
+            dbChat.Users.Add(new DbChatUser
+            {
+                User = dbOwner,
+                Role = roleOwner,
+            });
 
-                if (role == null || user == null)
+            foreach (string userId in chat.ChatUserIds)
+            {
+                if (userId == ownerId)
                 {
-                    return null;
+                    continue;
+                }
+                
+                var user = dbUsers.FirstOrDefault(f => f.Id == userId);
+                if (user == null)
+                {
+                    return new Result<Chat>(ResultStatus.InternalError, Chat.Instance, Constants.UnknownErrorMessage);
                 }
 
                 var dbChatUser = new DbChatUser
                 {
                     User = user,
-                    Role = role,
+                    Role = roleUser,
                 };
 
                 dbChat.Users.Add(dbChatUser);
@@ -72,11 +106,11 @@ namespace Sulimov.MyChat.Server.BL.Services
             dbContext.Add(dbChat);
             await dbContext.SaveChangesAsync();
 
-            return CreateChatModel(dbChat);
+            return new Result<Chat>(ResultStatus.Success, CreateChatModel(dbChat), string.Empty);
         }
 
         /// <inheritdoc/>
-        public async Task<Chat> AddUserToChat(int chatId, string actualUserId, string userId)
+        public async Task<Result<Chat>> AddUserToChat(int chatId, string currentUserId, string userId)
         {
             var chat = await dbContext.Chats
                 .Include(i => i.Users)
@@ -85,53 +119,75 @@ namespace Sulimov.MyChat.Server.BL.Services
                     .ThenInclude(t => t.User)
                 .FirstOrDefaultAsync(f => f.Id == chatId);
 
-            var user = await dbContext.Users.FirstOrDefaultAsync(f => f.Id == userId);
-
-            if (chat == null 
-                || user == null
-                || chat.Users.FirstOrDefault(f => f.User.Id == userId) != null
-                || chat.Users.FirstOrDefault(f => f.User.Id == actualUserId)?.Role?.Name != Constants.ChatAdminRoleName)
+            if (chat == null)
             {
-                return null;
+                return new Result<Chat>(ResultStatus.NotFound, Chat.Instance, $"Chat {chatId} not found.");
+            }
+
+            var user = await dbContext.Users.FirstOrDefaultAsync(f => f.Id == userId);
+            if (user == null)
+            {
+                return new Result<Chat>(ResultStatus.NotFound, Chat.Instance, $"User {userId} not found.");
+            }
+
+            var chatUser = chat.Users.FirstOrDefault(f => f.User.Id == currentUserId);
+            if (chatUser == null || chatUser.Role.Name == Constants.ChatUserRoleName)
+            {
+                return new Result<Chat>(ResultStatus.Forbidden, Chat.Instance, $"Current user doesn't have permission.");
+            }
+
+            var role = await dbContext.ChatRoles.FirstOrDefaultAsync(f => f.Name == Constants.ChatUserRoleName);
+            if (role == null)
+            {
+                return new Result<Chat>(ResultStatus.InternalError, Chat.Instance, Constants.UnknownErrorMessage);
             }
 
             chat.Users.Add(new DbChatUser
             {
                 User = user,
-                Role = await dbContext.ChatRoles.FirstOrDefaultAsync(f => f.Name == Constants.ChatUserRoleName),
+                Role = role,
             });
 
             await dbContext.SaveChangesAsync();
 
-            return CreateChatModel(chat);
+            return new Result<Chat>(ResultStatus.Success, CreateChatModel(chat), string.Empty);
         }
 
         /// <inheritdoc/>
-        public async Task<Chat> RemoveUserFromChat(int chatId, string actualUserId, string userId)
+        public async Task<Result<Chat>> RemoveUserFromChat(int chatId, string currentUserId, string userId)
         {
             var chat = await dbContext.Chats
                 .Include(i => i.Users)
                     .ThenInclude(t => t.User)
+                .Include(i => i.Users)
+                    .ThenInclude(t => t.Role)
                 .FirstOrDefaultAsync(f => f.Id == chatId);
 
-            var chatUser = chat?.Users?.FirstOrDefault(f => f.User.Id == userId);
-
-            if (chat == null
-                || chatUser == null
-                || (chat.Users.FirstOrDefault(f => f.User.Id == actualUserId)?.Role?.Name != Constants.ChatAdminRoleName || actualUserId != userId))
+            if (chat == null)
             {
-                return null;
+                return new Result<Chat>(ResultStatus.NotFound, Chat.Instance, $"Chat {chatId} not found.");
             }
 
-            chat.Users.Remove(chatUser);
+            var user = chat.Users.FirstOrDefault(f => f.User.Id == userId);
+            if (user == null)
+            {
+                return new Result<Chat>(ResultStatus.Forbidden, Chat.Instance, $"User {userId} doesn't include in the chat {chatId}.");
+            }
 
+            var currentUser = chat.Users.FirstOrDefault(f => f.User.Id == currentUserId);
+            if (currentUser == null || currentUser.Role.Name == Constants.ChatUserRoleName)
+            {
+                return new Result<Chat>(ResultStatus.Forbidden, Chat.Instance, $"Current user doesn't have permission.");
+            }
+
+            chat.Users.Remove(user);
             await dbContext.SaveChangesAsync();
 
-            return CreateChatModel(chat);
+            return new Result<Chat>(ResultStatus.Success, CreateChatModel(chat), string.Empty);
         }
 
         /// <inheritdoc/>
-        public async Task<Chat> SetChatAdmin(int chatId, string actualUserId, string userId)
+        public async Task<Result<Chat>> SetChatAdmin(int chatId, string currentUserId, string userId)
         {
             var chat = await dbContext.Chats
                 .Include(i => i.Users)
@@ -140,25 +196,37 @@ namespace Sulimov.MyChat.Server.BL.Services
                     .ThenInclude(t => t.User)
                 .FirstOrDefaultAsync(f => f.Id == chatId);
 
-            var chatUser = chat?.Users?.FirstOrDefault(f => f.User.Id == userId);
-
-            if (chat == null
-                || chatUser == null
-                || chatUser.Role.Name == Constants.ChatOwnerRoleName
-                || chat.Users.FirstOrDefault(f => f.User.Id == actualUserId)?.Role?.Name != Constants.ChatOwnerRoleName)
+            if (chat == null)
             {
-                return null;
+                return new Result<Chat>(ResultStatus.NotFound, Chat.Instance, $"Chat {chatId} not found.");
             }
 
-            chatUser.Role = await dbContext.ChatRoles.FirstOrDefaultAsync(f => f.Name == Constants.ChatAdminRoleName);
+            var user = chat.Users.FirstOrDefault(f => f.User.Id == userId);
+            if (user == null)
+            {
+                return new Result<Chat>(ResultStatus.Forbidden, Chat.Instance, $"User {userId} doesn't include in the chat {chatId}.");
+            }
 
+            var currentUser = chat.Users.FirstOrDefault(f => f.User.Id == currentUserId);
+            if (currentUser == null || currentUser.Role.Name != Constants.ChatOwnerRoleName)
+            {
+                return new Result<Chat>(ResultStatus.Forbidden, Chat.Instance, $"Current user doesn't have permission.");
+            }
+
+            var newRole = await dbContext.ChatRoles.FirstOrDefaultAsync(f => f.Name == Constants.ChatAdminRoleName);
+            if (newRole == null)
+            {
+                return new Result<Chat>(ResultStatus.InternalError, Chat.Instance, Constants.UnknownErrorMessage);
+            }
+
+            user.Role = newRole;
             await dbContext.SaveChangesAsync();
 
-            return CreateChatModel(chat);
+            return new Result<Chat>(ResultStatus.Success, CreateChatModel(chat), string.Empty);
         }
 
         /// <inheritdoc/>
-        public async Task<Chat> RemoveChatAdmin(int chatId, string actualUserId, string userId)
+        public async Task<Result<Chat>> RemoveChatAdmin(int chatId, string currentUserId, string userId)
         {
             var chat = await dbContext.Chats
                 .Include(i => i.Users)
@@ -167,20 +235,33 @@ namespace Sulimov.MyChat.Server.BL.Services
                     .ThenInclude(t => t.User)
                 .FirstOrDefaultAsync(f => f.Id == chatId);
 
-            var chatUser = chat?.Users?.FirstOrDefault(f => f.User.Id == userId);
-
-            if (chat == null
-                || chatUser == null
-                || chatUser.Role.Name != Constants.ChatOwnerRoleName)
+            if (chat == null)
             {
-                return null;
+                return new Result<Chat>(ResultStatus.NotFound, Chat.Instance, $"Chat {chatId} not found.");
             }
 
-            chatUser.Role = await dbContext.ChatRoles.FirstOrDefaultAsync(f => f.Name == Constants.ChatUserRoleName);
+            var user = chat.Users.FirstOrDefault(f => f.User.Id == userId);
+            if (user == null)
+            {
+                return new Result<Chat>(ResultStatus.Forbidden, Chat.Instance, $"User {userId} doesn't include in the chat {chatId}.");
+            }
 
+            var currentUser = chat.Users.FirstOrDefault(f => f.User.Id == currentUserId);
+            if (currentUser == null || currentUser.Role.Name != Constants.ChatOwnerRoleName)
+            {
+                return new Result<Chat>(ResultStatus.Forbidden, Chat.Instance, $"Current user doesn't have permission.");
+            }
+
+            var newRole = await dbContext.ChatRoles.FirstOrDefaultAsync(f => f.Name == Constants.ChatUserRoleName);
+            if (newRole == null)
+            {
+                return new Result<Chat>(ResultStatus.InternalError, Chat.Instance, Constants.UnknownErrorMessage);
+            }
+
+            user.Role = newRole;
             await dbContext.SaveChangesAsync();
 
-            return CreateChatModel(chat);
+            return new Result<Chat>(ResultStatus.Success, CreateChatModel(chat), string.Empty);
         }
 
         private Chat CreateChatModel(DbChat dbChat)

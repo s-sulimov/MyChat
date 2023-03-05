@@ -19,5 +19,15 @@
         /// Object not found.
         /// </summary>
         NotFound,
+
+        /// <summary>
+        /// Resource is forbidden.
+        /// </summary>
+        Forbidden,
+
+        /// <summary>
+        /// Internal server error.
+        /// </summary>
+        InternalError,
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Sulimov.MyChat.Server.BL.Models;
+using Sulimov.MyChat.Server.BL.Models.Requests;
 
 namespace Sulimov.MyChat.Server.BL.Services
 {
@@ -10,52 +11,52 @@ namespace Sulimov.MyChat.Server.BL.Services
         /// <summary>
         /// Return all users's chat.
         /// </summary>
-        /// <param name="userId"></param>
-        /// <returns></returns>
-        Task<IEnumerable<Chat>> GetUserChats(string userId);
+        /// <param name="userId">User ID.</param>
+        /// <returns>Result that contains the list of available chats.</returns>
+        Task<Result<IEnumerable<Chat>>> GetUserChats(string userId);
 
         /// <summary>
         /// Create new chat.
         /// </summary>
         /// <param name="chat">New chat.</param>
         /// <param name="ownerId">Chat owner ID.</param>
-        /// <returns>New chat.</returns>
-        Task<Chat> CreateChat(Chat chat, string ownerId);
+        /// <returns>Result that contains new chat..</returns>
+        Task<Result<Chat>> CreateChat(CreateChatRequest chat, string ownerId);
 
         /// <summary>
         /// Add user to chat.
         /// </summary>
         /// <param name="chatId">Chat ID.</param>
-        /// <param name="actualUserId">Actual user ID.</param>
+        /// <param name="currentUserId">Actual user ID.</param>
         /// <param name="userId">User ID.</param>
-        /// <returns>Chat.</returns>
-        Task<Chat> AddUserToChat(int chatId, string actualUserId, string userId);
+        /// <returns>Result that contains the chat.</returns>
+        Task<Result<Chat>> AddUserToChat(int chatId, string currentUserId, string userId);
 
         /// <summary>
         /// Remove user from chat.
         /// </summary>
         /// <param name="chatId">Chat ID.</param>
-        /// <param name="actualUserId">Actual user ID.</param>
+        /// <param name="currentUserId">Actual user ID.</param>
         /// <param name="userId">User ID.</param>
-        /// <returns>Chat.</returns>
-        Task<Chat> RemoveUserFromChat(int chatId, string actualUserId, string userId);
+        /// <returns>Result that contains the chat.</returns>
+        Task<Result<Chat>> RemoveUserFromChat(int chatId, string currentUserId, string userId);
 
         /// <summary>
         /// Set admin role for chat user.
         /// </summary>
         /// <param name="chatId">Chat ID.</param>
-        /// <param name="actualUserId">Actual user ID.</param>
+        /// <param name="currentUserId">Actual user ID.</param>
         /// <param name="userId">User ID.</param>
-        /// <returns>Chat.</returns>
-        Task<Chat> SetChatAdmin(int chatId, string actualUserId, string userId);
+        /// <returns>Result that contains the chat.</returns>
+        Task<Result<Chat>> SetChatAdmin(int chatId, string currentUserId, string userId);
 
         /// <summary>
         /// Remove admin role for chat user.
         /// </summary>
         /// <param name="chatId">Chat ID.</param>
-        /// <param name="actualUserId">Actual user ID.</param>
+        /// <param name="currentUserId">Actual user ID.</param>
         /// <param name="userId">User ID.</param>
-        /// <returns>Chat.</returns>
-        Task<Chat> RemoveChatAdmin(int chatId, string actualUserId, string userId);
+        /// <returns>Result that contains the chat.</returns>
+        Task<Result<Chat>> RemoveChatAdmin(int chatId, string currentUserId, string userId);
     }
 }

@@ -20,25 +20,27 @@ namespace Sulimov.MyChat.Server.Controllers
             this.httpContextAccessor = httpContextAccessor;
         }
 
+        // api/messages
         [HttpGet]
-        public async Task<IActionResult> GetMessages(int chatId)
+        public async Task<ActionResult<IEnumerable<Message>>> GetMessages(int chatId)
         {
-            return Ok(await messageService.GetAllChatMessages(chatId));
+            var result = await messageService.GetAllChatMessages(chatId);
+            return ResultHelper.CreateHttpResult(result, this);
         }
 
+        // api/messages
         [HttpPost]
-        public async Task<IActionResult> SendMessage(Message message)
+        public async Task<ActionResult<Message>> SendMessage(SendMessageRequest message)
         {
-            var userId = this.httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            var result = await messageService.SaveMessage(message, userId);
-
-            if (result == null)
+            if (!ModelState.IsValid)
             {
                 return BadRequest();
             }
 
+            var userId = this.httpContextAccessor?.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
+            var result = await messageService.SaveMessage(userId, message.ChatId, message.Message);
 
-            return Ok(result);
+            return ResultHelper.CreateHttpResult(result, this);
         }
     }
 }

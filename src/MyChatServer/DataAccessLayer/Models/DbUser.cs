@@ -10,6 +10,6 @@ namespace Sulimov.MyChat.Server.DAL.Models
         /// <summary>
         /// User chats.
         /// </summary>
-        public List<DbChat> Chats { get; set; }
+        public List<DbChat> Chats { get; set; } = new List<DbChat>();
     }
 }

@@ -6,6 +6,11 @@
     public class Message
     {
         /// <summary>
+        /// Default instance of <see cref="Message"/>
+        /// </summary>
+        public static Message Instance { get; set; } = new Message();
+
+        /// <summary>
         /// Identifier.
         /// </summary>
         public int Id { get; set; }

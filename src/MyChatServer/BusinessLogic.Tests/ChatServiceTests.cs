@@ -24,11 +24,11 @@ namespace Sulimov.MyChat.Server.BL.FunctionalTests
         public async Task RemoveUserFromChat(int chatId, string actualUserId, string userId, bool expected)
         {
             // Act.
-            var chat = await chateService.RemoveUserFromChat(chatId, actualUserId, userId);
+            var result = await chateService.RemoveUserFromChat(chatId, actualUserId, userId);
 
             // Assert.
-            Assert.AreEqual(expected, chat != null);
-            Assert.AreEqual(expected, !chat?.Users.Any(a => a.User.Id == userId) ?? true);
+            Assert.AreEqual(expected, result != null);
+            Assert.AreEqual(expected, !result?.Data.Users.Any(a => a.User.Id == userId) ?? true);
 
             bool userRemoved = false;
             using (var context = new DataContext(options))
