@@ -29,10 +29,25 @@ namespace Sulimov.MyChat.Server.BL.Services
         /// <inheritdoc/>
         public async Task<Result<Message>> SaveMessage(string senderId, int chatId, string message)
         {
-            var chat = await dbContext.Chats.FirstOrDefaultAsync(f => f.Id == chatId);
+            var chat = await dbContext.Chats
+                .Include(i => i.Users)
+                    .ThenInclude(t => t.User)
+                .FirstOrDefaultAsync(f => f.Id == chatId);
+
             if (chat == null)
             {
                 return new Result<Message>(ResultStatus.NotFound, Message.Instance, "Chat not found.");
+            }
+
+            var sender = await dbContext.Users.FirstOrDefaultAsync(f => f.Id == senderId);
+            if (sender == null)
+            {
+                return new Result<Message>(ResultStatus.NotFound, Message.Instance, $"Sender {senderId} not found.");
+            }
+
+            if (!chat.Users.Any(a => a.User.Id == senderId))
+            {
+                return new Result<Message>(ResultStatus.NotFound, Message.Instance, $"Sender {senderId} isn't included to chat {chatId}.");
             }
             
             var dbModel = new DbMessage
