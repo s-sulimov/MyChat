@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Sulimov.MyChat.Server.BL.Models.Requests
+namespace Sulimov.MyChat.Server.Models
 {
     /// <summary>
     /// Request for update user in chat.

@@ -2,7 +2,7 @@
 using Sulimov.MyChat.Server.BL.Models;
 using System.ComponentModel;
 
-namespace Sulimov.MyChat.Server
+namespace Sulimov.MyChat.Server.Helpers
 {
     /// <summary>
     /// Common helper for work with service result.

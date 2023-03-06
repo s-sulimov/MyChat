@@ -1,10 +1,13 @@
-﻿namespace Sulimov.MyChat.Server.BL.Models
+﻿namespace Sulimov.MyChat.Server.Models
 {
     /// <summary>
     /// Response for authentification request.
     /// </summary>
     public class AuthenticationResponse
     {
+        /// <summary>
+        /// Default instance of the <see cref="AuthenticationResponse"/>
+        /// </summary>
         public static AuthenticationResponse Instance { get; } = new AuthenticationResponse(string.Empty, default);
         
         /// <summary>

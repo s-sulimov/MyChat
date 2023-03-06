@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Sulimov.MyChat.Server.BL.Models;
+using Sulimov.MyChat.Server.Helpers;
+using Sulimov.MyChat.Server.Models;
 using Sulimov.MyChat.Server.Services;
 using System.Security.Claims;
 

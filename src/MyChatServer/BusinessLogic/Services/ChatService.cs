@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Sulimov.MyChat.Server.BL.Models;
-using Sulimov.MyChat.Server.BL.Models.Requests;
 using Sulimov.MyChat.Server.Core;
 using Sulimov.MyChat.Server.DAL;
 using Sulimov.MyChat.Server.DAL.Models;
@@ -35,17 +34,17 @@ namespace Sulimov.MyChat.Server.BL.Services
         }
 
         /// <inheritdoc/>
-        public async Task<Result<Chat>> CreateChat(CreateChatRequest chat, string ownerId)
+        public async Task<Result<Chat>> CreateChat(string title, IEnumerable<string> userIds, string ownerId)
         {
             var dbUsers = await dbContext.Users
-                .Where(w => w.Id == ownerId || chat.ChatUserIds.Contains(w.Id))
+                .Where(w => w.Id == ownerId || userIds.Contains(w.Id))
                 .ToArrayAsync();
 
             var sb = new StringBuilder();
 
-            foreach (string userId in chat.ChatUserIds)
+            foreach (string userId in userIds)
             {
-                if (dbUsers.Any(a => a.Id == userId))
+                if (!dbUsers.Any(a => a.Id == userId))
                 {
                     sb.AppendLine($"User {userId} not found.");
                 }
@@ -64,7 +63,7 @@ namespace Sulimov.MyChat.Server.BL.Services
 
             var dbChat = new DbChat
             {
-                Title = chat.Title,
+                Title = title,
                 Users = new List<DbChatUser>(),
             };
 
@@ -81,7 +80,7 @@ namespace Sulimov.MyChat.Server.BL.Services
                 Role = roleOwner,
             });
 
-            foreach (string userId in chat.ChatUserIds)
+            foreach (string userId in userIds)
             {
                 if (userId == ownerId)
                 {
@@ -112,6 +111,11 @@ namespace Sulimov.MyChat.Server.BL.Services
         /// <inheritdoc/>
         public async Task<Result<Chat>> AddUserToChat(int chatId, string currentUserId, string userId)
         {
+            if (currentUserId == userId)
+            {
+                return new Result<Chat>(ResultStatus.BadData, Chat.Instance, "You can't add yourself");
+            }
+            
             var chat = await dbContext.Chats
                 .Include(i => i.Users)
                     .ThenInclude(t => t.Role)
@@ -169,7 +173,7 @@ namespace Sulimov.MyChat.Server.BL.Services
             }
 
             var user = chat.Users.FirstOrDefault(f => f.User.Id == userId);
-            if (user == null)
+            if (user == null || user.Role.Name == Constants.ChatOwnerRoleName)
             {
                 return new Result<Chat>(ResultStatus.Forbidden, Chat.Instance, $"User {userId} doesn't include in the chat {chatId}.");
             }
@@ -189,6 +193,11 @@ namespace Sulimov.MyChat.Server.BL.Services
         /// <inheritdoc/>
         public async Task<Result<Chat>> SetChatAdmin(int chatId, string currentUserId, string userId)
         {
+            if (currentUserId == userId)
+            {
+                return new Result<Chat>(ResultStatus.BadData, Chat.Instance, "You can't add yourself");
+            }
+
             var chat = await dbContext.Chats
                 .Include(i => i.Users)
                     .ThenInclude(t => t.Role)

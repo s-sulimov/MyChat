@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Sulimov.MyChat.Server.BL.Models
+namespace Sulimov.MyChat.Server.Models
 {
     /// <summary>
     /// DTO for authentification request.

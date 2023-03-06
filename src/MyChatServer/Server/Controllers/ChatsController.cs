@@ -2,9 +2,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Sulimov.MyChat.Server.BL.Models;
-using Sulimov.MyChat.Server.BL.Models.Requests;
 using Sulimov.MyChat.Server.BL.Services;
+using Sulimov.MyChat.Server.Helpers;
 using Sulimov.MyChat.Server.Hubs;
+using Sulimov.MyChat.Server.Models;
 using System.Security.Claims;
 
 namespace Sulimov.MyChat.Server.Controllers
@@ -45,7 +46,7 @@ namespace Sulimov.MyChat.Server.Controllers
             }
 
             var currentUserId = this.httpContextAccessor?.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
-            var result = await this.chateService.CreateChat(request, currentUserId);
+            var result = await this.chateService.CreateChat(request.Title, request.ChatUserIds, currentUserId);
 
             await SendResult(result, currentUserId);
 

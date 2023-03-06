@@ -1,5 +1,4 @@
 ﻿using Sulimov.MyChat.Server.BL.Models;
-using Sulimov.MyChat.Server.BL.Models.Requests;
 
 namespace Sulimov.MyChat.Server.BL.Services
 {
@@ -18,10 +17,11 @@ namespace Sulimov.MyChat.Server.BL.Services
         /// <summary>
         /// Create new chat.
         /// </summary>
-        /// <param name="chat">New chat.</param>
+        /// <param name="title">New chat title.</param>
+        /// <param name="title">Chat users IDs.</param>
         /// <param name="ownerId">Chat owner ID.</param>
         /// <returns>Result that contains new chat..</returns>
-        Task<Result<Chat>> CreateChat(CreateChatRequest chat, string ownerId);
+        Task<Result<Chat>> CreateChat(string title, IEnumerable<string> userIds, string ownerId);
 
         /// <summary>
         /// Add user to chat.

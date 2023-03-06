@@ -3,7 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Sulimov.MyChat.Server.BL.Models;
 using Sulimov.MyChat.Server.BL.Services;
+using Sulimov.MyChat.Server.Helpers;
 using Sulimov.MyChat.Server.Hubs;
+using Sulimov.MyChat.Server.Models;
 using System.Security.Claims;
 
 namespace Sulimov.MyChat.Server.Controllers

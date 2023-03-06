@@ -1,4 +1,5 @@
 ﻿using Sulimov.MyChat.Server.BL.Models;
+using Sulimov.MyChat.Server.Models;
 
 namespace Sulimov.MyChat.Server.Services
 {

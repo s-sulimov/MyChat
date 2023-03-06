@@ -1,4 +1,4 @@
-﻿using Sulimov.MyChat.Server.BL.Models;
+﻿using Sulimov.MyChat.Server.Models;
 using Sulimov.MyChat.Server.DAL.Models;
 using System.Security.Claims;
 

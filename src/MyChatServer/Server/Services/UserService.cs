@@ -2,6 +2,7 @@
 using Sulimov.MyChat.Server.BL.Models;
 using Sulimov.MyChat.Server.Core;
 using Sulimov.MyChat.Server.DAL.Models;
+using Sulimov.MyChat.Server.Models;
 using System.Security.Claims;
 
 namespace Sulimov.MyChat.Server.Services
