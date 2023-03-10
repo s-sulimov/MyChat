@@ -1,30 +1,32 @@
-﻿namespace Sulimov.MyChat.Server.BL.Models
+﻿using Sulimov.MyChat.Server.Core.Models;
+using Sulimov.MyChat.Server.DAL.Models;
+
+namespace Sulimov.MyChat.Server.BL.Models
 {
-    /// <summary>
-    /// Collection item for chat user.
-    /// </summary>
-    public class ChatUser
+    /// <inheritdoc/>
+    public class ChatUser : IChatUser
     {
-        /// <summary>
-        /// Identifier.
-        /// </summary>
+        /// <inheritdoc/>
         public int Id { get; set; }
 
-        /// <summary>
-        /// Chat user.
-        /// </summary>
-        public User User { get; set; }
+        /// <inheritdoc/>
+        public IUser User { get; set; }
 
-        /// <summary>
-        /// User role.
-        /// </summary>
-        public ChatRole Role { get; set; }
+        /// <inheritdoc/>
+        public IChatRole Role { get; set; }
 
         public ChatUser(int id, User user, ChatRole role)
         {
             Id = id;
             User = user;
             Role = role;
+        }
+
+        public ChatUser(DbChatUser dbChatUser)
+        {
+            Id = dbChatUser.Id;
+            User = new User(dbChatUser.User);
+            Role = new ChatRole(dbChatUser.Role);
         }
     }
 }

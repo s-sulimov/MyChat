@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Sulimov.MyChat.Server.BL.Models;
 using Sulimov.MyChat.Server.BL.Services;
 using Sulimov.MyChat.Server.Core;
+using Sulimov.MyChat.Server.Core.Services;
 using Sulimov.MyChat.Server.DAL;
 using Sulimov.MyChat.Server.DAL.Models;
 
@@ -9,7 +9,7 @@ namespace Sulimov.MyChat.Server.BL.FunctionalTests
 {
     [TestClass]
     public class MessageServiceFunctionalTests
-    {
+    {        
         DbContextOptions<DataContext> options;
         IMessageService messageService;
 
@@ -35,18 +35,37 @@ namespace Sulimov.MyChat.Server.BL.FunctionalTests
         }
 
         [TestMethod]
-        [DataRow(2, 0)]
-        [DataRow(1, 2)]
-        public async Task GetAllChatMessages(int chatId, int messageCountExpected)
+        [DataRow(2, "1", 0)]
+        [DataRow(1, "4", 0)]
+        [DataRow(1, "1", 2)]
+        public async Task GetAllChatMessages(int chatId, string currentUserId, int messageCountExpected)
         {
             // Arrange.
             await ResetDataBase();
 
             // Act.
-            var result = await messageService.GetAllChatMessages(chatId);
+            var result = await messageService.GetAllChatMessages(chatId, currentUserId);
 
             // Assert.
             Assert.AreEqual(messageCountExpected, result.Data.Count());
+        }
+
+        [TestMethod]
+        [DataRow(2, "1", 0)]
+        [DataRow(1, "4", 0)]
+        [DataRow(1, "1", 2)]
+        public async Task GetLastChatMessages(int chatId, string currentUserId, int messageCountExpected)
+        {
+            // Arrange.
+            await ResetDataBase();
+
+            // Act.
+            var result1 = await messageService.GetLastChatMessages(chatId, currentUserId, DateTime.Now.AddHours(1).ToUniversalTime());
+            var result2 = await messageService.GetLastChatMessages(chatId, currentUserId, DateTime.MinValue.ToUniversalTime());
+
+            // Assert.
+            Assert.AreEqual(0, result1.Data.Count());
+            Assert.AreEqual(messageCountExpected, result2.Data.Count());
         }
 
         [TestMethod]
@@ -156,7 +175,7 @@ namespace Sulimov.MyChat.Server.BL.FunctionalTests
                 context.Messages.Add(new DbMessage
                 {
                     Chat = newChat,
-                    Date = DateTime.Now,
+                    Date = DateTime.MinValue.ToUniversalTime(),
                     SenderId = "1",
                     Text = "Hey",
                 });
@@ -164,7 +183,7 @@ namespace Sulimov.MyChat.Server.BL.FunctionalTests
                 context.Messages.Add(new DbMessage
                 {
                     Chat = newChat,
-                    Date = DateTime.Now,
+                    Date = DateTime.Now.ToUniversalTime(),
                     SenderId = "2",
                     Text = "Hey guys",
                 });

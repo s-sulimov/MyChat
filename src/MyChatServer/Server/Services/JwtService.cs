@@ -1,6 +1,6 @@
 ﻿using Microsoft.IdentityModel.Tokens;
-using Sulimov.MyChat.Server.Models;
 using Sulimov.MyChat.Server.DAL.Models;
+using Sulimov.MyChat.Server.Models.Responses;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;

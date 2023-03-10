@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Sulimov.MyChat.Server.BL.Models;
+using Sulimov.MyChat.Server.Core;
+using Sulimov.MyChat.Server.Core.Models;
+using Sulimov.MyChat.Server.Core.Services;
 using Sulimov.MyChat.Server.Helpers;
 using Sulimov.MyChat.Server.Models;
+using Sulimov.MyChat.Server.Models.Responses;
 using Sulimov.MyChat.Server.Services;
-using System.Security.Claims;
 
 namespace Sulimov.MyChat.Server.Controllers
 {
@@ -13,28 +15,30 @@ namespace Sulimov.MyChat.Server.Controllers
     [Authorize]
     public class UsersController : ControllerBase
     {
+        private readonly IAuthentificationService authentificationService;
         private readonly IUserService userService;
         private readonly IHttpContextAccessor httpContextAccessor;
 
-        public UsersController(IUserService userService, IHttpContextAccessor httpContextAccessor)
+        public UsersController(IUserService userService, IHttpContextAccessor httpContextAccessor, IAuthentificationService authentificationService)
         {
             this.userService = userService;
             this.httpContextAccessor = httpContextAccessor;
+            this.authentificationService = authentificationService;
         }
 
         // api/users
         [HttpGet]
-        public async Task<ActionResult<User>> GetUser(string name)
+        public async Task<ActionResult<IUser>> GetUser(string name)
         {
             var result = await userService.GetUser(name);
 
-            return ResultHelper.CreateHttpResult(result, this);
+            return ResultHelper.CreateHttpResult(this, result);
         }
 
         // api/users/create
         [HttpPost("create")]
         [AllowAnonymous]
-        public async Task<ActionResult<User>> CreateUser(CreateUserRequest request)
+        public async Task<ActionResult<IUser>> CreateUser(CreateUserRequest request)
         {
             if (!ModelState.IsValid)
             {
@@ -43,7 +47,7 @@ namespace Sulimov.MyChat.Server.Controllers
 
             var result = await userService.CreateUser(request.Name, request.Email, request.Password);
 
-            return ResultHelper.CreateHttpResult(result, this);
+            return ResultHelper.CreateHttpResult(this, result);
         }
 
         // api/users/login
@@ -56,39 +60,49 @@ namespace Sulimov.MyChat.Server.Controllers
                 return BadRequest();
             }
 
-            var result = await userService.Login(request.Login, request.Password);
+            var result = await authentificationService.Login(request.Login, request.Password);
 
-            return ResultHelper.CreateHttpResult(result, this);
+            return ResultHelper.CreateHttpResult(this, result);
         }
 
         // api/users/change-email
         [HttpPatch("change-email")]
-        public async Task<ActionResult<User>> ChangeEmail(ChangeUserEmailRequest request)
+        public async Task<ActionResult<IUser>> ChangeEmail(ChangeUserEmailRequest request)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest();
             }
 
-            var userId = httpContextAccessor?.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
+            var userId = ControllerHelper.GetCurrentUserId(httpContextAccessor);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return StatusCode(500, Constants.UnknownErrorMessage);
+            }
+
             var result = await userService.ChangeEmail(userId, request.Password, request.Email);
 
-            return ResultHelper.CreateHttpResult(result, this);
+            return ResultHelper.CreateHttpResult(this, result);
         }
 
         // api/users/change-password
         [HttpPatch("change-password")]
-        public async Task<ActionResult<User>> ChangePassword(ChangeUserPasswordRequest request)
+        public async Task<ActionResult<IUser>> ChangePassword(ChangeUserPasswordRequest request)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest();
             }
 
-            var userId = httpContextAccessor?.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
+            var userId = ControllerHelper.GetCurrentUserId(httpContextAccessor);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return StatusCode(500, Constants.UnknownErrorMessage);
+            }
+
             var result = await userService.ChangePassword(userId, request.CurrentPassword, request.NewPassword);
 
-            return ResultHelper.CreateHttpResult(result, this);
+            return ResultHelper.CreateHttpResult(this, result);
         }
     }
 }

@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using Sulimov.MyChat.Server.BL.Models;
-using Sulimov.MyChat.Server.BL.Services;
+using Sulimov.MyChat.Server.Core;
+using Sulimov.MyChat.Server.Core.Models;
+using Sulimov.MyChat.Server.Core.Services;
 using Sulimov.MyChat.Server.Helpers;
 using Sulimov.MyChat.Server.Hubs;
 using Sulimov.MyChat.Server.Models;
-using System.Security.Claims;
 
 namespace Sulimov.MyChat.Server.Controllers
 {
@@ -28,100 +28,130 @@ namespace Sulimov.MyChat.Server.Controllers
 
         // api/chats
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Chat>>> GetChats()
+        public async Task<ActionResult<IEnumerable<IChat>>> GetChats()
         {
-            var userId = httpContextAccessor?.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
+            var userId = ControllerHelper.GetCurrentUserId(httpContextAccessor);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return StatusCode(500, Constants.UnknownErrorMessage);
+            }
+
             var result = await chateService.GetUserChats(userId);
 
-            return ResultHelper.CreateHttpResult(result, this);
+            return ResultHelper.CreateHttpResult(this, result);
         }
 
         // api/chats
         [HttpPost]
-        public async Task<ActionResult<Chat>> CreateChat(CreateChatRequest request)
+        public async Task<ActionResult<IChat>> CreateChat(CreateChatRequest request)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest();
             }
 
-            var currentUserId = this.httpContextAccessor?.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
+            var currentUserId = ControllerHelper.GetCurrentUserId(httpContextAccessor);
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                return StatusCode(500, Constants.UnknownErrorMessage);
+            }
+
             var result = await this.chateService.CreateChat(request.Title, request.ChatUserIds, currentUserId);
 
             await SendResult(result, currentUserId);
 
-            return ResultHelper.CreateHttpResult(result, this);
+            return ResultHelper.CreateHttpResult(this, result);
         }
 
         // api/chats/add-user
         [HttpPut("add-user")]
-        public async Task<ActionResult<Chat>> AddUserToChat(UpdateChatUserRequest request)
+        public async Task<ActionResult<IChat>> AddUserToChat(UpdateChatUserRequest request)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest();
             }
 
-            var currentUserId = this.httpContextAccessor?.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
+            var currentUserId = ControllerHelper.GetCurrentUserId(httpContextAccessor);
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                return StatusCode(500, Constants.UnknownErrorMessage);
+            }
+
             var result = await this.chateService.AddUserToChat(request.ChatId, currentUserId, request.UserId);
 
             await SendResult(result, currentUserId);
 
-            return ResultHelper.CreateHttpResult(result, this);
+            return ResultHelper.CreateHttpResult(this, result);
         }
 
         // api/chats/remove-user
         [HttpPut("remove-user")]
-        public async Task<ActionResult<Chat>> RemoveUserFromChat(UpdateChatUserRequest request)
+        public async Task<ActionResult<IChat>> RemoveUserFromChat(UpdateChatUserRequest request)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest();
             }
 
-            var currentUserId = this.httpContextAccessor?.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
+            var currentUserId = ControllerHelper.GetCurrentUserId(httpContextAccessor);
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                return StatusCode(500, Constants.UnknownErrorMessage);
+            }
+
             var result = await this.chateService.RemoveUserFromChat(request.ChatId, currentUserId, request.UserId);
 
             await SendResult(result, currentUserId);
 
-            return ResultHelper.CreateHttpResult(result, this);
+            return ResultHelper.CreateHttpResult(this, result);
         }
 
         // api/chats/set-admin
         [HttpPut("set-admin")]
-        public async Task<ActionResult<Chat>> SetChatAdmin(UpdateChatUserRequest request)
+        public async Task<ActionResult<IChat>> SetChatAdmin(UpdateChatUserRequest request)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest();
             }
 
-            var currentUserId = this.httpContextAccessor?.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
+            var currentUserId = ControllerHelper.GetCurrentUserId(httpContextAccessor);
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                return StatusCode(500, Constants.UnknownErrorMessage);
+            }
+
             var result = await this.chateService.SetChatAdmin(request.ChatId, currentUserId, request.UserId);
 
             await SendResult(result, currentUserId);
 
-            return ResultHelper.CreateHttpResult(result, this);
+            return ResultHelper.CreateHttpResult(this, result);
         }
 
         // api/chats/remove-admin
         [HttpPut("remove-admin")]
-        public async Task<ActionResult<Chat>> RemoveChatAdmin(UpdateChatUserRequest request)
+        public async Task<ActionResult<IChat>> RemoveChatAdmin(UpdateChatUserRequest request)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest();
             }
 
-            var currentUserId = this.httpContextAccessor?.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
+            var currentUserId = ControllerHelper.GetCurrentUserId(httpContextAccessor);
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                return StatusCode(500, Constants.UnknownErrorMessage);
+            }
+
             var result = await this.chateService.RemoveChatAdmin(request.ChatId, currentUserId, request.UserId);
 
             await SendResult(result, currentUserId);
 
-            return ResultHelper.CreateHttpResult(result, this);
+            return ResultHelper.CreateHttpResult(this, result);
         }
 
-        private async Task SendResult(Result<Chat> result, string currentUserId)
+        private async Task SendResult(IResult<IChat> result, string currentUserId)
         {
             if (result.IsSuccess)
             {

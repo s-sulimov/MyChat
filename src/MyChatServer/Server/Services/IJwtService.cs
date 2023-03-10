@@ -1,5 +1,5 @@
-﻿using Sulimov.MyChat.Server.Models;
-using Sulimov.MyChat.Server.DAL.Models;
+﻿using Sulimov.MyChat.Server.DAL.Models;
+using Sulimov.MyChat.Server.Models.Responses;
 using System.Security.Claims;
 
 namespace Sulimov.MyChat.Server.Services

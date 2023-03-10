@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Sulimov.MyChat.Server.BL.Services;
 using Sulimov.MyChat.Server.Core;
+using Sulimov.MyChat.Server.Core.Services;
 using Sulimov.MyChat.Server.DAL;
 using Sulimov.MyChat.Server.DAL.Models;
 

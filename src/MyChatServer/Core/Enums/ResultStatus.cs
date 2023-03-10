@@ -1,4 +1,4 @@
-﻿namespace Sulimov.MyChat.Server.BL.Models
+﻿namespace Sulimov.MyChat.Server.Core.Enums
 {
     /// <summary>
     /// Service result statuses.

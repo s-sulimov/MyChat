@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Sulimov.MyChat.Server.BL.Services;
+using Sulimov.MyChat.Server.Core.Services;
 using Sulimov.MyChat.Server.DAL;
 using Sulimov.MyChat.Server.DAL.Models;
 using Sulimov.MyChat.Server.Hubs;
@@ -61,9 +62,10 @@ namespace Sulimov.MyChat.Server
 
             services.AddHttpContextAccessor();
 
+            services.AddScoped<IJwtService, JwtService>();
+            services.AddScoped<IAuthentificationService, AuthentificationService>();
             services.AddScoped<IMessageService, MessageService>();
             services.AddScoped<IChateService, ChatService>();
-            services.AddScoped<IJwtService, JwtService>();
             services.AddScoped<IUserService, UserService>();
 
             services.AddSwaggerGen();

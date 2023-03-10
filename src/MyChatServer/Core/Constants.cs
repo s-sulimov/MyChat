@@ -30,6 +30,9 @@
         /// </summary>
         public static string ChatUserRoleName = "User";
 
+        /// <summary>
+        /// Message for unknown error.
+        /// </summary>
         public static string UnknownErrorMessage = "Unknown error. Please, conntact with the support.";
     }
 }

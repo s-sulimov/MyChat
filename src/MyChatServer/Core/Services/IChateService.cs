@@ -1,6 +1,6 @@
-﻿using Sulimov.MyChat.Server.BL.Models;
+﻿using Sulimov.MyChat.Server.Core.Models;
 
-namespace Sulimov.MyChat.Server.BL.Services
+namespace Sulimov.MyChat.Server.Core.Services
 {
     /// <summary>
     /// Service for work with chats.
@@ -12,7 +12,7 @@ namespace Sulimov.MyChat.Server.BL.Services
         /// </summary>
         /// <param name="userId">User ID.</param>
         /// <returns>Result that contains the list of available chats.</returns>
-        Task<Result<IEnumerable<Chat>>> GetUserChats(string userId);
+        Task<IResult<IEnumerable<IChat>>> GetUserChats(string userId);
 
         /// <summary>
         /// Create new chat.
@@ -21,7 +21,7 @@ namespace Sulimov.MyChat.Server.BL.Services
         /// <param name="title">Chat users IDs.</param>
         /// <param name="ownerId">Chat owner ID.</param>
         /// <returns>Result that contains new chat..</returns>
-        Task<Result<Chat>> CreateChat(string title, IEnumerable<string> userIds, string ownerId);
+        Task<IResult<IChat>> CreateChat(string title, IEnumerable<string> userIds, string ownerId);
 
         /// <summary>
         /// Add user to chat.
@@ -30,7 +30,7 @@ namespace Sulimov.MyChat.Server.BL.Services
         /// <param name="currentUserId">Actual user ID.</param>
         /// <param name="userId">User ID.</param>
         /// <returns>Result that contains the chat.</returns>
-        Task<Result<Chat>> AddUserToChat(int chatId, string currentUserId, string userId);
+        Task<IResult<IChat>> AddUserToChat(int chatId, string currentUserId, string userId);
 
         /// <summary>
         /// Remove user from chat.
@@ -39,7 +39,7 @@ namespace Sulimov.MyChat.Server.BL.Services
         /// <param name="currentUserId">Actual user ID.</param>
         /// <param name="userId">User ID.</param>
         /// <returns>Result that contains the chat.</returns>
-        Task<Result<Chat>> RemoveUserFromChat(int chatId, string currentUserId, string userId);
+        Task<IResult<IChat>> RemoveUserFromChat(int chatId, string currentUserId, string userId);
 
         /// <summary>
         /// Set admin role for chat user.
@@ -48,7 +48,7 @@ namespace Sulimov.MyChat.Server.BL.Services
         /// <param name="currentUserId">Actual user ID.</param>
         /// <param name="userId">User ID.</param>
         /// <returns>Result that contains the chat.</returns>
-        Task<Result<Chat>> SetChatAdmin(int chatId, string currentUserId, string userId);
+        Task<IResult<IChat>> SetChatAdmin(int chatId, string currentUserId, string userId);
 
         /// <summary>
         /// Remove admin role for chat user.
@@ -57,7 +57,7 @@ namespace Sulimov.MyChat.Server.BL.Services
         /// <param name="currentUserId">Actual user ID.</param>
         /// <param name="userId">User ID.</param>
         /// <returns>Result that contains the chat.</returns>
-        Task<Result<Chat>> RemoveChatAdmin(int chatId, string currentUserId, string userId);
+        Task<IResult<IChat>> RemoveChatAdmin(int chatId, string currentUserId, string userId);
 
         /// <summary>
         /// Get all chat's users.

@@ -1,4 +1,4 @@
-﻿namespace Sulimov.MyChat.Server.Models
+﻿namespace Sulimov.MyChat.Server.Models.Responses
 {
     /// <summary>
     /// Response for authentification request.
