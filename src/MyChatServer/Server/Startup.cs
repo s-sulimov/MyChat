@@ -77,6 +77,12 @@ namespace Sulimov.MyChat.Server
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            using (var scope = app.ApplicationServices.GetService<IServiceScopeFactory>()?.CreateScope())
+            {
+                var dbContext = scope?.ServiceProvider.GetRequiredService<DataContext>();
+                dbContext?.Database.Migrate();
+            }
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
