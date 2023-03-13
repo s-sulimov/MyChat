@@ -26,25 +26,25 @@ namespace Sulimov.MyChat.Server.BL.Services
             var user = await userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                return new Result<IUser>(ResultStatus.NotFound, User.Instance, $"User {userId} not found.");
+                return new Result<IUser>(ResultStatus.ObjectNotFound, User.Instance, $"User {userId} not found.");
             }
 
             var checkPasswordResult = await signInManager.CheckPasswordSignInAsync(user, password, false);
             if (!checkPasswordResult.Succeeded)
             {
-                return new Result<IUser>(ResultStatus.BadData, User.Instance, "Bad credentials");
+                return new Result<IUser>(ResultStatus.InconsistentData, User.Instance, "Bad credentials");
             }
 
             var token = await userManager.GenerateChangeEmailTokenAsync(user, email);
             if (token == null)
             {
-                return new Result<IUser>(ResultStatus.BadData, User.Instance, "Bad email");
+                return new Result<IUser>(ResultStatus.InconsistentData, User.Instance, "Bad email");
             }
 
             var result = await userManager.ChangeEmailAsync(user, email, token);
             if (!result.Succeeded)
             {
-                return new Result<IUser>(ResultStatus.BadData, User.Instance, Constants.UnknownErrorMessage);
+                return new Result<IUser>(ResultStatus.InconsistentData, User.Instance, Constants.UnknownErrorMessage);
             }
 
             return new Result<IUser>(ResultStatus.Success, new User(user), string.Empty);
@@ -56,13 +56,13 @@ namespace Sulimov.MyChat.Server.BL.Services
             var user = await userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                return new Result<IUser>(ResultStatus.NotFound, User.Instance, $"User {userId} not found.");
+                return new Result<IUser>(ResultStatus.ObjectNotFound, User.Instance, $"User {userId} not found.");
             }
 
             var result = await userManager.ChangePasswordAsync(user, currentPassword, newPassword);
             if (!result.Succeeded)
             {
-                return new Result<IUser>(ResultStatus.BadData, User.Instance, Constants.UnknownErrorMessage);
+                return new Result<IUser>(ResultStatus.InconsistentData, User.Instance, Constants.UnknownErrorMessage);
             }
 
             return new Result<IUser>(ResultStatus.Success, new User(user), string.Empty);
@@ -82,14 +82,14 @@ namespace Sulimov.MyChat.Server.BL.Services
 
             if (!result.Succeeded)
             {
-                return new Result<IUser>(ResultStatus.BadData, User.Instance, "User with this credentials has already exists");
+                return new Result<IUser>(ResultStatus.InconsistentData, User.Instance, "User with this credentials has already exists");
             }
 
             var dbUser = await userManager.FindByNameAsync(userName);
             result = await userManager.AddToRoleAsync(dbUser, Constants.IdentityUserRoleName);
             if (!result.Succeeded)
             {
-                return new Result<IUser>(ResultStatus.BadData, User.Instance, Constants.UnknownErrorMessage);
+                return new Result<IUser>(ResultStatus.InconsistentData, User.Instance, Constants.UnknownErrorMessage);
             }
 
             return new Result<IUser>(ResultStatus.Success, new User(dbUser), string.Empty);
@@ -101,7 +101,7 @@ namespace Sulimov.MyChat.Server.BL.Services
             DbUser dbUser = await userManager.FindByNameAsync(userName) ?? await userManager.FindByEmailAsync(userName);
             if (dbUser == null)
             {
-                return new Result<IUser>(ResultStatus.NotFound, User.Instance, $"User with login or email {userName} not found.");
+                return new Result<IUser>(ResultStatus.ObjectNotFound, User.Instance, $"User with login or email {userName} not found.");
             }
 
             return new Result<IUser>(ResultStatus.Success, new User(dbUser), string.Empty);

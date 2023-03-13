@@ -65,7 +65,7 @@ namespace Sulimov.MyChat.Server
             services.AddScoped<IJwtService, JwtService>();
             services.AddScoped<IAuthentificationService, AuthentificationService>();
             services.AddScoped<IMessageService, MessageService>();
-            services.AddScoped<IChateService, ChatService>();
+            services.AddScoped<IChatService, ChatService>();
             services.AddScoped<IUserService, UserService>();
 
             services.AddSwaggerGen();

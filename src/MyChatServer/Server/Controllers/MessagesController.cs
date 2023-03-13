@@ -18,18 +18,18 @@ namespace Sulimov.MyChat.Server.Controllers
         private readonly IMessageService messageService;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly IHubContext<ChatHub> chatHubContext;
-        private readonly IChateService chateService;
+        private readonly IChatService chatService;
 
         public MessagesController(
             IMessageService messageService,
             IHttpContextAccessor httpContextAccessor,
             IHubContext<ChatHub> chatHubContext,
-            IChateService chatService)
+            IChatService chatService)
         {
             this.messageService = messageService;
             this.httpContextAccessor = httpContextAccessor;
             this.chatHubContext = chatHubContext;
-            this.chateService = chatService;
+            this.chatService = chatService;
         }
 
         // api/messages/all
@@ -81,7 +81,7 @@ namespace Sulimov.MyChat.Server.Controllers
 
             if (result.IsSuccess)
             {
-                var users = await chateService.GetChatUsers(message.ChatId, userId);
+                var users = await chatService.GetChatUsers(message.ChatId, userId);
                 await chatHubContext.Clients.Users(users).SendAsync("message", result.Data);
             }
 

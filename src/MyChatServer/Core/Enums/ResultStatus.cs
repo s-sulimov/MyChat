@@ -11,23 +11,23 @@
         Success,
 
         /// <summary>
-        /// Bad data.
+        /// Inconsistent data.
         /// </summary>
-        BadData,
+        InconsistentData,
 
         /// <summary>
         /// Object not found.
         /// </summary>
-        NotFound,
+        ObjectNotFound,
 
         /// <summary>
-        /// Resource is forbidden.
+        /// Access is denied.
         /// </summary>
-        Forbidden,
+        AccessDenied,
 
         /// <summary>
-        /// Internal server error.
+        /// Unhandled server error.
         /// </summary>
-        InternalError,
+        UnhandledError,
     }
 }

@@ -11,7 +11,7 @@ namespace Sulimov.MyChat.Server.BL.FunctionalTests
     public class ChatServiceFunctionalTests
     {
         DbContextOptions<DataContext> options;
-        IChateService chateService;
+        IChatService chatService;
 
         public ChatServiceFunctionalTests()
         {
@@ -21,7 +21,7 @@ namespace Sulimov.MyChat.Server.BL.FunctionalTests
 
             FillDataBase();
 
-            chateService = new ChatService(new DataContext(options));
+            chatService = new ChatService(new DataContext(options));
         }
 
         [TestMethod]
@@ -33,7 +33,7 @@ namespace Sulimov.MyChat.Server.BL.FunctionalTests
             await ResetDataBase();
 
             // Act.
-            var result = await chateService.GetUserChats(userId);
+            var result = await chatService.GetUserChats(userId);
 
             // Assert.
             Assert.AreEqual(expectedChatsCount, result.Data.Count());
@@ -50,7 +50,7 @@ namespace Sulimov.MyChat.Server.BL.FunctionalTests
             await ResetDataBase();
 
             // Act.
-            var result = await chateService.CreateChat(title, userIds, ownerId);
+            var result = await chatService.CreateChat(title, userIds, ownerId);
 
             // Assert.
             Assert.AreEqual(expected, result.IsSuccess);
@@ -69,7 +69,7 @@ namespace Sulimov.MyChat.Server.BL.FunctionalTests
             await ResetDataBase();
 
             // Act.
-            var result = await chateService.RemoveUserFromChat(chatId, actualUserId, userId);
+            var result = await chatService.RemoveUserFromChat(chatId, actualUserId, userId);
 
             // Assert.
             Assert.AreEqual(expected, result.IsSuccess);
@@ -88,7 +88,7 @@ namespace Sulimov.MyChat.Server.BL.FunctionalTests
             await ResetDataBase();
 
             // Act.
-            var result = await chateService.AddUserToChat(chatId, actualUserId, userId);
+            var result = await chatService.AddUserToChat(chatId, actualUserId, userId);
 
             // Assert.
             Assert.AreEqual(expected, result.IsSuccess);
@@ -107,7 +107,7 @@ namespace Sulimov.MyChat.Server.BL.FunctionalTests
             await ResetDataBase();
 
             // Act.
-            var result = await chateService.SetChatAdmin(chatId, currentUserId, userId);
+            var result = await chatService.SetChatAdmin(chatId, currentUserId, userId);
 
             // Assert.
             Assert.AreEqual(expected, result.IsSuccess);
@@ -126,7 +126,7 @@ namespace Sulimov.MyChat.Server.BL.FunctionalTests
             await ResetDataBase();
 
             // Act.
-            var result = await chateService.RemoveChatAdmin(chatId, currentUserId, userId);
+            var result = await chatService.RemoveChatAdmin(chatId, currentUserId, userId);
 
             // Assert.
             Assert.AreEqual(expected, result.IsSuccess);
@@ -143,7 +143,7 @@ namespace Sulimov.MyChat.Server.BL.FunctionalTests
             await ResetDataBase();
 
             // Act.
-            var result = await chateService.GetChatUsers(chatId, excludeUserId);
+            var result = await chatService.GetChatUsers(chatId, excludeUserId);
 
             // Assert.
             Assert.AreEqual(usersCountExpected, result.Count());

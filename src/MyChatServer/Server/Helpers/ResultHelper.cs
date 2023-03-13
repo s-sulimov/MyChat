@@ -26,13 +26,13 @@ namespace Sulimov.MyChat.Server.Helpers
             {
                 case ResultStatus.Success:
                     return controller.Ok(serviceResult.Data);
-                case ResultStatus.BadData:
+                case ResultStatus.InconsistentData:
                     return controller.BadRequest(serviceResult.Message);
-                case ResultStatus.NotFound:
+                case ResultStatus.ObjectNotFound:
                     return controller.NotFound(serviceResult.Message);
-                case ResultStatus.Forbidden:
+                case ResultStatus.AccessDenied:
                     return controller.Forbid(serviceResult.Message);
-                case ResultStatus.InternalError:
+                case ResultStatus.UnhandledError:
                     return controller.StatusCode(500, serviceResult.Message);
                 default:
                     throw new InvalidEnumArgumentException();

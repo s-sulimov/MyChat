@@ -15,13 +15,13 @@ namespace Sulimov.MyChat.Server.Controllers
     [Authorize(Roles = "User")]
     public class ChatsController : ControllerBase
     {
-        private readonly IChateService chateService;
+        private readonly IChatService chatService;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly IHubContext<ChatHub> chatHubContext;
 
-        public ChatsController(IChateService chateService, IHttpContextAccessor httpContextAccessor, IHubContext<ChatHub> chatHubContext)
+        public ChatsController(IChatService chatService, IHttpContextAccessor httpContextAccessor, IHubContext<ChatHub> chatHubContext)
         {
-            this.chateService = chateService;
+            this.chatService = chatService;
             this.httpContextAccessor = httpContextAccessor;
             this.chatHubContext = chatHubContext;
         }
@@ -36,7 +36,7 @@ namespace Sulimov.MyChat.Server.Controllers
                 return StatusCode(500, Constants.UnknownErrorMessage);
             }
 
-            var result = await chateService.GetUserChats(userId);
+            var result = await chatService.GetUserChats(userId);
 
             return ResultHelper.CreateHttpResult(this, result);
         }
@@ -56,7 +56,7 @@ namespace Sulimov.MyChat.Server.Controllers
                 return StatusCode(500, Constants.UnknownErrorMessage);
             }
 
-            var result = await this.chateService.CreateChat(request.Title, request.ChatUserIds, currentUserId);
+            var result = await this.chatService.CreateChat(request.Title, request.ChatUserIds, currentUserId);
 
             await SendResult(result, currentUserId);
 
@@ -78,7 +78,7 @@ namespace Sulimov.MyChat.Server.Controllers
                 return StatusCode(500, Constants.UnknownErrorMessage);
             }
 
-            var result = await this.chateService.AddUserToChat(request.ChatId, currentUserId, request.UserId);
+            var result = await this.chatService.AddUserToChat(request.ChatId, currentUserId, request.UserId);
 
             await SendResult(result, currentUserId);
 
@@ -100,7 +100,7 @@ namespace Sulimov.MyChat.Server.Controllers
                 return StatusCode(500, Constants.UnknownErrorMessage);
             }
 
-            var result = await this.chateService.RemoveUserFromChat(request.ChatId, currentUserId, request.UserId);
+            var result = await this.chatService.RemoveUserFromChat(request.ChatId, currentUserId, request.UserId);
 
             await SendResult(result, currentUserId);
 
@@ -122,7 +122,7 @@ namespace Sulimov.MyChat.Server.Controllers
                 return StatusCode(500, Constants.UnknownErrorMessage);
             }
 
-            var result = await this.chateService.SetChatAdmin(request.ChatId, currentUserId, request.UserId);
+            var result = await this.chatService.SetChatAdmin(request.ChatId, currentUserId, request.UserId);
 
             await SendResult(result, currentUserId);
 
@@ -144,7 +144,7 @@ namespace Sulimov.MyChat.Server.Controllers
                 return StatusCode(500, Constants.UnknownErrorMessage);
             }
 
-            var result = await this.chateService.RemoveChatAdmin(request.ChatId, currentUserId, request.UserId);
+            var result = await this.chatService.RemoveChatAdmin(request.ChatId, currentUserId, request.UserId);
 
             await SendResult(result, currentUserId);
 

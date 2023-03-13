@@ -5,7 +5,7 @@ namespace Sulimov.MyChat.Server.Core.Services
     /// <summary>
     /// Service for work with chats.
     /// </summary>
-    public interface IChateService
+    public interface IChatService
     {
         /// <summary>
         /// Return all users's chat.

@@ -62,18 +62,18 @@ namespace Sulimov.MyChat.Server.BL.Services
 
             if (chat == null)
             {
-                return new Result<IMessage>(ResultStatus.NotFound, Message.Instance, "Chat not found.");
+                return new Result<IMessage>(ResultStatus.ObjectNotFound, Message.Instance, "Chat not found.");
             }
 
             var sender = await dbContext.Users.FirstOrDefaultAsync(f => f.Id == senderId);
             if (sender == null)
             {
-                return new Result<IMessage>(ResultStatus.NotFound, Message.Instance, $"Sender {senderId} not found.");
+                return new Result<IMessage>(ResultStatus.ObjectNotFound, Message.Instance, $"Sender {senderId} not found.");
             }
 
             if (!chat.Users.Any(a => a.User.Id == senderId))
             {
-                return new Result<IMessage>(ResultStatus.NotFound, Message.Instance, $"Sender {senderId} isn't included to chat {chatId}.");
+                return new Result<IMessage>(ResultStatus.ObjectNotFound, Message.Instance, $"Sender {senderId} isn't included to chat {chatId}.");
             }
             
             var dbModel = new DbMessage
@@ -99,12 +99,12 @@ namespace Sulimov.MyChat.Server.BL.Services
 
             if (chat == null)
             {
-                return new Result<IEnumerable<IMessage>>(ResultStatus.NotFound, new List<Message>(), $"Chat {chatId} not found.");
+                return new Result<IEnumerable<IMessage>>(ResultStatus.ObjectNotFound, new List<Message>(), $"Chat {chatId} not found.");
             }
 
             if (!chat.Users.Any(a => a.User.Id == currentUserId))
             {
-                return new Result<IEnumerable<IMessage>>(ResultStatus.Forbidden, new List<Message>(), $"User {currentUserId} doesn't have access to chat {chatId}");
+                return new Result<IEnumerable<IMessage>>(ResultStatus.AccessDenied, new List<Message>(), $"User {currentUserId} doesn't have access to chat {chatId}");
             }
 
             return new Result<IEnumerable<IMessage>>(ResultStatus.Success, new List<Message>());
