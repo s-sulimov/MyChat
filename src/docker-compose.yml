@@ -11,7 +11,7 @@ services:
   db:
     image: mcr.microsoft.com/mssql/server:2022-latest
     volumes:
-      - sqlData:/var/opt/mssql
+      - sqlDB:/var/opt/mssql
     ports:
       - "1433:1433"
     environment:
