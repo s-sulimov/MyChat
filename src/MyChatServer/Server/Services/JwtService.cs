@@ -53,6 +53,7 @@ namespace Sulimov.MyChat.Server.Services
                 new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
                 new Claim(ClaimTypes.Name, user.UserName),
                 new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.NameIdentifier, user.UserName),
             };
 
             foreach (Claim claim in roleClaims)

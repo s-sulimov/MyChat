@@ -1,20 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Json;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Sulimov.MyChat.Client.ViewModels;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using Newtonsoft.Json;
 
 namespace Sulimov.MyChat.Client
 {
@@ -23,9 +8,12 @@ namespace Sulimov.MyChat.Client
     /// </summary>
     public partial class SignUp : Window
     {
-        public SignUp()
+        private UserViewModel userViewModel;
+
+        public SignUp(UserViewModel userViewModel)
         {
             InitializeComponent();
+            this.userViewModel = userViewModel;
         }
 
         private async void RegisterBtn_Click(object sender, RoutedEventArgs e)
@@ -54,20 +42,10 @@ namespace Sulimov.MyChat.Client
                 return;
             }
 
-            var data = new
+            var result = await userViewModel.Register(this.LoginTxtBox.Text, this.PasswordTxtBox.Text, this.EmailTxtBox.Text);
+            if (!result.IsSuccess)
             {
-                Name = this.LoginTxtBox.Text,
-                Email = this.EmailTxtBox.Text,
-                Password = this.PasswordTxtBox.Text,
-            };
-
-            using var client = new HttpClient();
-
-            var response = await client.PostAsJsonAsync(Constants.ApiUrl + "users", data);
-
-            if (response.StatusCode != HttpStatusCode.Created)
-            {
-                MessageBox.Show($"User {this.LoginTxtBox.Text} already exists.");
+                MessageBox.Show(result.Message);
                 return;
             }
 

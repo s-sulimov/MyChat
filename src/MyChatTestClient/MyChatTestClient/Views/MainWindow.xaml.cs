@@ -19,6 +19,8 @@ using System.Net.Http.Headers;
 using System.Reflection;
 using System.Net;
 using System.Windows.Markup;
+using Sulimov.MyChat.Client.ViewModels;
+using Microsoft.AspNetCore.SignalR.Client;
 
 namespace Sulimov.MyChat.Client
 {
@@ -29,32 +31,62 @@ namespace Sulimov.MyChat.Client
     {        
         private Credentials credentials;
         private int actualChatId;
+        private UserViewModel userViewModel;
+        private HttpClient httpClient;
+        private HubConnection hubConnection;
+        private ChatViewModel chatViewModel;
 
         public MainWindow()
         {
             InitializeComponent();
+
+            httpClient = new HttpClient();
+            userViewModel = new UserViewModel(httpClient);
         }
 
         private void SignUp_Click(object sender, RoutedEventArgs e)
         {
-            var signUpWindow = new SignUp();
+            var signUpWindow = new SignUp(userViewModel);
             signUpWindow.Show();
         }
 
         private async void SignIn_Click(object sender, RoutedEventArgs e)
         {
-            var signInWindow = new SignIn();
+            var signInWindow = new SignIn(userViewModel);
             signInWindow.ShowDialog();
 
-            if (signInWindow.Credentials == null)
+            if (this.userViewModel.CurrentCredentials == null)
             {
                 return;
             }
 
-            this.credentials = signInWindow.Credentials;
+            this.credentials = this.userViewModel.CurrentCredentials;
             this.UserLabel.Content = this.credentials.Login;
 
-            await GetChats();
+            hubConnection = new HubConnectionBuilder()
+                .WithUrl("http://localhost/chat-hub", options =>
+                {
+                    options.AccessTokenProvider = () => Task.FromResult(userViewModel.CurrentCredentials.Token);
+                })
+                .Build();
+
+            hubConnection.Closed += async (error) =>
+            {
+                await Task.Delay(new Random().Next(0, 5) * 1000);
+                await hubConnection.StartAsync();
+            };
+
+            await hubConnection.StartAsync();
+
+            chatViewModel = new ChatViewModel(httpClient, userViewModel.CurrentCredentials, hubConnection);
+
+            chatViewModel.onChatListUpdated += UpdateChats;
+
+            var chatResult = await chatViewModel.GetAllUserChats();
+            if (!chatResult.IsSuccess)
+            {
+                MessageBox.Show(chatResult.Message);
+            }
         }
 
         private async void ChatList_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -77,39 +109,8 @@ namespace Sulimov.MyChat.Client
 
         private void CreateChatBtn_Click(object sender, RoutedEventArgs e)
         {
-            var createChatWindow = new CreateChat(credentials);
+            var createChatWindow = new CreateChat(this.userViewModel.CurrentCredentials, chatViewModel, userViewModel);
             createChatWindow.ShowDialog();
-
-            if (createChatWindow.Chat != null && createChatWindow.Chat.Id != 0)
-            {
-                this.ChatList.Items.Add(createChatWindow.Chat);
-            }
-        }
-
-        private async Task GetChats()
-        {
-            using var client = new HttpClient();
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(Constants.AuthMethod, this.credentials.Token);
-            var response = await client.GetAsync($"{Constants.ApiUrl}chats");
-
-            if (!response.IsSuccessStatusCode)
-            {
-                MessageBox.Show("Problem with network.");
-                return;
-            }
-
-            this.ChatList.Items.Clear();
-
-            var chats = await response.Content.ReadFromJsonAsync<IEnumerable<Chat>>();
-            foreach (Chat chat in chats)
-            {
-                if (string.IsNullOrEmpty(chat.Title))
-                {
-                    chat.Title = chat.Users.FirstOrDefault(f => f.Name != this.credentials.Login).Name;
-                }
-
-                this.ChatList.Items.Add(chat);
-            }
         }
 
         private async Task GetMessages()
@@ -163,6 +164,15 @@ namespace Sulimov.MyChat.Client
 
             this.MessagesList.Items.Add(responseData);
             this.MessageTxtBox.Text = string.Empty;
+        }
+
+        private void UpdateChats(List<Chat> chats)
+        {
+            this.ChatList.Items.Clear();
+            foreach (Chat chat in chats)
+            {
+                this.ChatList.Items.Add(chat);
+            }
         }
     }
 }

@@ -28,6 +28,7 @@ namespace Sulimov.MyChat.Server.Controllers
 
         // api/chats
         [HttpGet]
+        [Produces("application/json")]
         public async Task<ActionResult<IEnumerable<IChat>>> GetChats()
         {
             var userId = ControllerHelper.GetCurrentUserId(httpContextAccessor);
@@ -43,6 +44,7 @@ namespace Sulimov.MyChat.Server.Controllers
 
         // api/chats
         [HttpPost]
+        [Produces("application/json")]
         public async Task<ActionResult<IChat>> CreateChat(CreateChatRequest request)
         {
             if (!ModelState.IsValid)
@@ -65,6 +67,7 @@ namespace Sulimov.MyChat.Server.Controllers
 
         // api/chats/add-user
         [HttpPut("add-user")]
+        [Produces("application/json")]
         public async Task<ActionResult<IChat>> AddUserToChat(UpdateChatUserRequest request)
         {
             if (!ModelState.IsValid)
@@ -87,6 +90,7 @@ namespace Sulimov.MyChat.Server.Controllers
 
         // api/chats/remove-user
         [HttpPut("remove-user")]
+        [Produces("application/json")]
         public async Task<ActionResult<IChat>> RemoveUserFromChat(UpdateChatUserRequest request)
         {
             if (!ModelState.IsValid)
@@ -109,6 +113,7 @@ namespace Sulimov.MyChat.Server.Controllers
 
         // api/chats/set-admin
         [HttpPut("set-admin")]
+        [Produces("application/json")]
         public async Task<ActionResult<IChat>> SetChatAdmin(UpdateChatUserRequest request)
         {
             if (!ModelState.IsValid)
@@ -131,6 +136,7 @@ namespace Sulimov.MyChat.Server.Controllers
 
         // api/chats/remove-admin
         [HttpPut("remove-admin")]
+        [Produces("application/json")]
         public async Task<ActionResult<IChat>> RemoveChatAdmin(UpdateChatUserRequest request)
         {
             if (!ModelState.IsValid)
@@ -157,10 +163,12 @@ namespace Sulimov.MyChat.Server.Controllers
             {
                 var users = result.Data.Users
                     .Where(w => w.User.Id != currentUserId)
-                    .Select(s => s.User.Id)
+                    .Select(s => s.User.Name)
                     .ToArray();
 
-                await chatHubContext.Clients.Clients(users).SendAsync("chat", result.Data);
+                var hubUsers = chatHubContext.Clients.Clients(users);
+
+                await hubUsers.SendAsync("chat", result.Data);
             }
         }
     }

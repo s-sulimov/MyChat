@@ -34,6 +34,7 @@ namespace Sulimov.MyChat.Server.Controllers
 
         // api/messages/all
         [HttpGet("all")]
+        [Produces("application/json")]
         public async Task<ActionResult<IEnumerable<IMessage>>> GetAllMessages(int chatId)
         {
             var userId = ControllerHelper.GetCurrentUserId(httpContextAccessor);
@@ -49,6 +50,7 @@ namespace Sulimov.MyChat.Server.Controllers
 
         // api/messages/last
         [HttpGet("last")]
+        [Produces("application/json")]
         public async Task<ActionResult<IEnumerable<IMessage>>> GetLastMessages(int chatId, DateTime fromDateTime)
         {
             var userId = ControllerHelper.GetCurrentUserId(httpContextAccessor);
@@ -64,6 +66,7 @@ namespace Sulimov.MyChat.Server.Controllers
 
         // api/messages
         [HttpPost]
+        [Produces("application/json")]
         public async Task<ActionResult<IMessage>> SendMessage(SendMessageRequest message)
         {
             if (!ModelState.IsValid)

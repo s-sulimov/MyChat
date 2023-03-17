@@ -16,6 +16,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Net.Http.Json;
+using Sulimov.MyChat.Client.ViewModels;
 
 namespace Sulimov.MyChat.Client
 {
@@ -26,14 +27,18 @@ namespace Sulimov.MyChat.Client
     {
         private Credentials credentials;
         private bool createNew = true;
+        private readonly ChatViewModel chatViewModel;
+        private readonly UserViewModel userViewModel;
 
         public Chat Chat;
 
-        public CreateChat(Credentials credentials, Chat actualChat = null)
+        public CreateChat(Credentials credentials, ChatViewModel chatViewModel, UserViewModel userViewModel, Chat actualChat = null)
         {
             InitializeComponent();
 
             this.credentials = credentials;
+            this.chatViewModel = chatViewModel;
+            this.userViewModel = userViewModel;
 
             if (credentials == null)
             {
@@ -44,15 +49,7 @@ namespace Sulimov.MyChat.Client
             if (actualChat == null)
             {
                 Chat = new Chat();
-                Chat.Users = new List<User>
-                {
-                    new User
-                    {
-                        Id = credentials.Id,
-                        Email = credentials.Email,
-                        Name = credentials.Login,
-                    }
-                };
+                Chat.Users = new List<ChatUser>();
                 FillUsers();
             }
             else
@@ -80,32 +77,15 @@ namespace Sulimov.MyChat.Client
                 return;
             }
 
-            if (Chat.Users.Any(a => a.Name == userLogin))
+            if (Chat.Users.Any(a => a.User.Name == userLogin))
             {
                 MessageBox.Show("Already added.");
                 return;
             }
-            
-            using var client = new HttpClient();
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(Constants.AuthMethod, this.credentials.Token);
 
-            var response = await client.GetAsync($"{Constants.ApiUrl}users?login={userLogin}");
+            var user = await userViewModel.GetUserInfo(userLogin);
 
-            if (response.StatusCode == HttpStatusCode.NotFound)
-            {
-                MessageBox.Show("User didn't find.");
-                return;
-            }
-
-            if (!response.IsSuccessStatusCode)
-            {
-                MessageBox.Show("Problem with network.");
-                return;
-            }
-
-            var user = await response.Content.ReadFromJsonAsync<User>();
-
-            Chat.Users.Add(user);
+            Chat.Users.Add(new ChatUser { User = user });
             FillUsers();
         }
 
@@ -119,7 +99,7 @@ namespace Sulimov.MyChat.Client
                 return;
             }
 
-            var user = Chat.Users.FirstOrDefault(f => f.Id == selectedUser.Id);
+            var user = Chat.Users.FirstOrDefault(f => f.User.Id == selectedUser.Id);
             Chat.Users.Remove(user);
             FillUsers();
         }
@@ -132,7 +112,7 @@ namespace Sulimov.MyChat.Client
                 return;
             }
 
-            if (Chat.Users.Count <= 1)
+            if (Chat.Users.Count == 0)
             {
                 MessageBox.Show("Please add users...");
                 return;
@@ -142,20 +122,15 @@ namespace Sulimov.MyChat.Client
             
             if (this.createNew)
             {
-                using var client = new HttpClient();
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(Constants.AuthMethod, this.credentials.Token);
-
-                var response = await client.PostAsJsonAsync($"{Constants.ApiUrl}chats", Chat);
-
-                if (!response.IsSuccessStatusCode)
+                var result = await chatViewModel.CreateChat(Chat.Title, Chat.Users.Select(s => s.User.Id).ToArray());
+                if (!result.IsSuccess)
                 {
-                    MessageBox.Show("Problem with network.");
-                    return;
+                    MessageBox.Show(result.Message);
                 }
-
-                Chat = await response.Content.ReadFromJsonAsync<Chat>();
-
-                this.Close();
+                else
+                {
+                    this.Close();
+                }
             }
         }
 

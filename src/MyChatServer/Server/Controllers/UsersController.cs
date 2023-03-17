@@ -19,7 +19,10 @@ namespace Sulimov.MyChat.Server.Controllers
         private readonly IUserService userService;
         private readonly IHttpContextAccessor httpContextAccessor;
 
-        public UsersController(IUserService userService, IHttpContextAccessor httpContextAccessor, IAuthentificationService authentificationService)
+        public UsersController(
+            IUserService userService,
+            IHttpContextAccessor httpContextAccessor,
+            IAuthentificationService authentificationService)
         {
             this.userService = userService;
             this.httpContextAccessor = httpContextAccessor;
@@ -28,6 +31,7 @@ namespace Sulimov.MyChat.Server.Controllers
 
         // api/users
         [HttpGet]
+        [Produces("application/json")]
         public async Task<ActionResult<IUser>> GetUser(string name)
         {
             var result = await userService.GetUser(name);
@@ -38,6 +42,7 @@ namespace Sulimov.MyChat.Server.Controllers
         // api/users/create
         [HttpPost("create")]
         [AllowAnonymous]
+        [Produces("application/json")]
         public async Task<ActionResult<IUser>> CreateUser(CreateUserRequest request)
         {
             if (!ModelState.IsValid)
@@ -53,6 +58,7 @@ namespace Sulimov.MyChat.Server.Controllers
         // api/users/login
         [HttpPost("login")]
         [AllowAnonymous]
+        [Produces("application/json")]
         public async Task<ActionResult<AuthenticationResponse>> Login(AuthenticationRequest request)
         {
             if (!ModelState.IsValid)
@@ -67,6 +73,7 @@ namespace Sulimov.MyChat.Server.Controllers
 
         // api/users/change-email
         [HttpPatch("change-email")]
+        [Produces("application/json")]
         public async Task<ActionResult<IUser>> ChangeEmail(ChangeUserEmailRequest request)
         {
             if (!ModelState.IsValid)
@@ -87,6 +94,7 @@ namespace Sulimov.MyChat.Server.Controllers
 
         // api/users/change-password
         [HttpPatch("change-password")]
+        [Produces("application/json")]
         public async Task<ActionResult<IUser>> ChangePassword(ChangeUserPasswordRequest request)
         {
             if (!ModelState.IsValid)

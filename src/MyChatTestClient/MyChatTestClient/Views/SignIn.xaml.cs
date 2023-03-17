@@ -16,6 +16,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Sulimov.MyChat.Client.Models;
+using Sulimov.MyChat.Client.ViewModels;
 
 namespace Sulimov.MyChat.Client
 {
@@ -24,11 +25,12 @@ namespace Sulimov.MyChat.Client
     /// </summary>
     public partial class SignIn : Window
     {
-        internal Credentials Credentials { get; set; }
+        private UserViewModel userViewModel;
 
-        public SignIn()
+        public SignIn(UserViewModel userViewModel)
         {
             InitializeComponent();
+            this.userViewModel = userViewModel;
         }
 
         private async void SignInBtn_Click(object sender, RoutedEventArgs e)
@@ -45,42 +47,11 @@ namespace Sulimov.MyChat.Client
                 return;
             }
 
-            var data = new
+            var result = await userViewModel.Login(this.LoginTxtBox.Text, this.PasswordTxtBox.Text);
+            if (!result.IsSuccess)
             {
-                Login = this.LoginTxtBox.Text,
-                Password = this.PasswordTxtBox.Text,
-            };
-
-            using var client = new HttpClient();
-
-            var response = await client.PostAsJsonAsync($"{Constants.ApiUrl}users/login", data);
-            if (response.StatusCode != HttpStatusCode.OK)
-            {
-                MessageBox.Show("Bad credentials");
-                return;
+                MessageBox.Show(result.Message);
             }
-
-            var responseData = await response.Content.ReadFromJsonAsync<AuthenticationResponse>();
-
-            this.Credentials = new Credentials
-            {
-                Login = this.LoginTxtBox.Text,
-                Password = this.PasswordTxtBox.Text,
-                Token = responseData.Token,
-            };
-
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(Constants.AuthMethod, this.Credentials.Token);
-            var userResponse = await client.GetAsync($"{Constants.ApiUrl}users?login={data.Login}");
-
-            if (!userResponse.IsSuccessStatusCode)
-            {
-                MessageBox.Show("Problem with network...");
-                return;
-            }
-
-            var user = await userResponse.Content.ReadFromJsonAsync<User>();
-            this.Credentials.Id = user.Id;
-            this.Credentials.Email = user.Email;
 
             this.Close();
         }
@@ -88,12 +59,6 @@ namespace Sulimov.MyChat.Client
         private void CancelBtn_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
-        }
-
-        class AuthenticationResponse
-        {
-            public string Token { get; set; }
-            public DateTime Expiration { get; set; }
         }
     }
 }

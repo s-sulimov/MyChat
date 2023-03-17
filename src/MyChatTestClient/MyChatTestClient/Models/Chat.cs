@@ -8,7 +8,7 @@ namespace Sulimov.MyChat.Client.Models
 
         public string Title { get; set; }
 
-        public List<User> Users { get; set; }
+        public List<ChatUser> Users { get; set; }
 
         public override string ToString()
         {
