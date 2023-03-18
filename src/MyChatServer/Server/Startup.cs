@@ -12,7 +12,7 @@ using System.Text;
 
 namespace Sulimov.MyChat.Server
 {
-    internal class Startup
+    public class Startup
     {
         private readonly IConfiguration configuration;
         
@@ -75,7 +75,7 @@ namespace Sulimov.MyChat.Server
                 .AddNewtonsoftJson();
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public static void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             using (var scope = app.ApplicationServices.GetService<IServiceScopeFactory>()?.CreateScope())
             {

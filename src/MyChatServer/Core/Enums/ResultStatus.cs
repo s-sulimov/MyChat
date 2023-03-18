@@ -3,7 +3,7 @@
     /// <summary>
     /// Service result statuses.
     /// </summary>
-    public enum ResultStatus : byte
+    public enum ResultStatus
     {
         /// <summary>
         /// Successful result.

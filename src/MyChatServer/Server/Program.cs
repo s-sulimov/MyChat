@@ -1,4 +1,6 @@
 using Serilog;
+using Serilog.Formatting.Compact;
+using System.Globalization;
 
 namespace Sulimov.MyChat.Server
 {
@@ -7,7 +9,7 @@ namespace Sulimov.MyChat.Server
         public static void Main(string[] args)
         {
             Log.Logger = new LoggerConfiguration()
-                .WriteTo.Console()
+                .WriteTo.Console(formatProvider: new CultureInfo("en-US"))
                 .CreateLogger();
 
             try

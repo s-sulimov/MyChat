@@ -13,7 +13,7 @@
         /// <summary>
         /// Mesaage date and time.
         /// </summary>
-        DateTime Date { get; set; }
+        DateTime DateTime { get; set; }
 
         /// <summary>
         /// Chat ID.

@@ -94,7 +94,7 @@ namespace Sulimov.MyChat.Server.BL.FunctionalTests
             using (var context = new DataContext(options))
             {
                 // If the database has already filled.
-                if (context.Users.Count() > 0)
+                if (context.Users.Any())
                 {
                     return;
                 }

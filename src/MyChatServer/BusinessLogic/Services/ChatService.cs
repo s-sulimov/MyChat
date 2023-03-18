@@ -6,6 +6,7 @@ using Sulimov.MyChat.Server.Core.Models;
 using Sulimov.MyChat.Server.Core.Services;
 using Sulimov.MyChat.Server.DAL;
 using Sulimov.MyChat.Server.DAL.Models;
+using System.Globalization;
 using System.Text;
 
 namespace Sulimov.MyChat.Server.BL.Services
@@ -49,14 +50,14 @@ namespace Sulimov.MyChat.Server.BL.Services
             {
                 if (!dbUsers.Any(a => a.Id == userId))
                 {
-                    sb.AppendLine($"User {userId} not found.");
+                    sb.AppendLine(new CultureInfo("en-US"), $"User {userId} not found.");
                 }
             }
 
             var dbOwner = dbUsers.FirstOrDefault(f => f.Id == ownerId);
             if (dbOwner == null)
             {
-                sb.AppendLine($"User {ownerId} not found.");
+                sb.AppendLine(new CultureInfo("en-US"), $"User {ownerId} not found.");
             }
 
             if (sb.Length > 0)
@@ -287,7 +288,7 @@ namespace Sulimov.MyChat.Server.BL.Services
 
             if (chat == null)
             {
-                return new string[0];
+                return Array.Empty<string>();
             }
             
             return chat.Users

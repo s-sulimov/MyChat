@@ -6,7 +6,7 @@ namespace Sulimov.MyChat.Client.Models
     {
         public int Id { get; set; }
 
-        public DateTime Date { get; set; }
+        public DateTime DateTime { get; set; }
 
         public int ChatId { get; set; }
 
@@ -18,7 +18,7 @@ namespace Sulimov.MyChat.Client.Models
 
         public override string ToString()
         {
-            return $"[{Date.ToLocalTime()}] {Sender.Name}: {Text}";
+            return $"[{DateTime.ToLocalTime()}] {Sender.Name}: {Text}";
         }
     }
 }

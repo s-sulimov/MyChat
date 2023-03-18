@@ -1,6 +1,7 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using Sulimov.MyChat.Server.DAL.Models;
 using Sulimov.MyChat.Server.Models.Responses;
+using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -44,13 +45,13 @@ namespace Sulimov.MyChat.Server.Services
                 signingCredentials: credentials
             );
 
-        private Claim[] CreateClaims(DbUser user, IEnumerable<Claim> roleClaims)
+        private static Claim[] CreateClaims(DbUser user, IEnumerable<Claim> roleClaims)
         {
             var claims = new List<Claim>()
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
+                new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString(new CultureInfo("en-US"))),
                 new Claim(ClaimTypes.Name, user.UserName),
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.NameIdentifier, user.UserName),

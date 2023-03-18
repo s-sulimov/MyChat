@@ -15,7 +15,7 @@ namespace Sulimov.MyChat.Server.BL.Models
         public int Id { get; set; }
 
         /// <inheritdoc/>
-        public DateTime Date { get; set; }
+        public DateTime DateTime { get; set; }
 
         /// <inheritdoc/>
         public int ChatId { get; set; }
@@ -32,7 +32,7 @@ namespace Sulimov.MyChat.Server.BL.Models
         {
             Id = dbMessage.Id;
             ChatId = dbMessage.Chat.Id;
-            Date = dbMessage.Date;
+            DateTime = dbMessage.Date;
             Sender = new User
             {
                 Id = dbMessage.Sender.Id,

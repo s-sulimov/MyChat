@@ -8,31 +8,31 @@
         /// <summary>
         /// Identity administrative role name.
         /// </summary>
-        public static string IdentityAdminRoleName = "Admin";
+        public const string IdentityAdminRoleName = "Admin";
 
         /// <summary>
         /// Identity user role name.
         /// </summary>
-        public static string IdentityUserRoleName = "User";
+        public const string IdentityUserRoleName = "User";
 
         /// <summary>
         /// Chat owner role name.
         /// </summary>
-        public static string ChatOwnerRoleName = "Owner";
+        public const string ChatOwnerRoleName = "Owner";
 
         /// <summary>
         /// Chat administrator role name.
         /// </summary>
-        public static string ChatAdminRoleName = "Admin";
+        public const string ChatAdminRoleName = "Admin";
 
         /// <summary>
         /// Chat user role name.
         /// </summary>
-        public static string ChatUserRoleName = "User";
+        public const string ChatUserRoleName = "User";
 
         /// <summary>
         /// Message for unknown error.
         /// </summary>
-        public static string UnknownErrorMessage = "Unknown error. Please, conntact with the support.";
+        public const string UnknownErrorMessage = "Unknown error. Please, conntact with the support.";
     }
 }

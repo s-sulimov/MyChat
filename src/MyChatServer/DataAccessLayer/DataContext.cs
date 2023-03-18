@@ -17,11 +17,11 @@ namespace Sulimov.MyChat.Server.DAL
             : base(options) { }
 #pragma warning restore CS8618
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        protected override void OnModelCreating(ModelBuilder builder)
         {
-            base.OnModelCreating(modelBuilder);
+            base.OnModelCreating(builder);
 
-            modelBuilder.Entity<IdentityRole>().HasData(new IdentityRole[]
+            builder?.Entity<IdentityRole>().HasData(new IdentityRole[]
             {
                 new IdentityRole
                 {
@@ -35,7 +35,7 @@ namespace Sulimov.MyChat.Server.DAL
                 },
             });
 
-            modelBuilder.Entity<DbChatRole>().HasData(new DbChatRole[]
+            builder?.Entity<DbChatRole>().HasData(new DbChatRole[]
             {
                 new DbChatRole
                 {
