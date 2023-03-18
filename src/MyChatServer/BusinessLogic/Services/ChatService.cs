@@ -278,7 +278,7 @@ namespace Sulimov.MyChat.Server.BL.Services
             return new Result<IChat>(ResultStatus.Success, new Chat(chat));
         }
 
-        public async Task<IEnumerable<string>> GetChatUsers(int chatId)
+        public async Task<IEnumerable<string>> GetChatUsers(int chatId, string excludeUserId)
         {
             var chat = await dbContext.Chats
                 .Include(i => i.Users)
@@ -291,6 +291,7 @@ namespace Sulimov.MyChat.Server.BL.Services
             }
             
             return chat.Users
+                .Where(w => w.User.Id != excludeUserId)
                 .Select(s => s.User.Id)
                 .ToArray();
         }

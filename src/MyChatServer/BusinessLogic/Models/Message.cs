@@ -31,7 +31,7 @@ namespace Sulimov.MyChat.Server.BL.Models
         public Message(DbMessage dbMessage)
         {
             Id = dbMessage.Id;
-            ChatId = dbMessage.Chat.Id;
+            ChatId = dbMessage.Id;
             Date = dbMessage.Date;
             Sender = new User
             {

@@ -98,7 +98,7 @@ namespace Sulimov.MyChat.Server
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapHub<ChatHub>("chat-hub");
+                endpoints.MapHub<ChatHub>("/chat-hub");
             });
         }
     }

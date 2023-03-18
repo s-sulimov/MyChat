@@ -60,7 +60,7 @@ namespace Sulimov.MyChat.Server.Controllers
 
             var result = await this.chatService.CreateChat(request.Title, request.ChatUserIds, currentUserId);
 
-            await SendResult(result);
+            await SendResult(result, currentUserId);
 
             return ResultHelper.CreateHttpResult(this, result);
         }
@@ -83,7 +83,7 @@ namespace Sulimov.MyChat.Server.Controllers
 
             var result = await this.chatService.AddUserToChat(request.ChatId, currentUserId, request.UserId);
 
-            await SendResult(result);
+            await SendResult(result, currentUserId);
 
             return ResultHelper.CreateHttpResult(this, result);
         }
@@ -106,10 +106,7 @@ namespace Sulimov.MyChat.Server.Controllers
 
             var result = await this.chatService.RemoveUserFromChat(request.ChatId, currentUserId, request.UserId);
 
-            if (result.IsSuccess)
-            {
-                await chatHubContext.Clients.Users(request.UserId).SendAsync("remove-user-from-chat", result.Data.Id);
-            }
+            await SendResult(result, currentUserId);
 
             return ResultHelper.CreateHttpResult(this, result);
         }
@@ -132,7 +129,7 @@ namespace Sulimov.MyChat.Server.Controllers
 
             var result = await this.chatService.SetChatAdmin(request.ChatId, currentUserId, request.UserId);
 
-            await SendResult(result);
+            await SendResult(result, currentUserId);
 
             return ResultHelper.CreateHttpResult(this, result);
         }
@@ -155,20 +152,23 @@ namespace Sulimov.MyChat.Server.Controllers
 
             var result = await this.chatService.RemoveChatAdmin(request.ChatId, currentUserId, request.UserId);
 
-            await SendResult(result);
+            await SendResult(result, currentUserId);
 
             return ResultHelper.CreateHttpResult(this, result);
         }
 
-        private async Task SendResult(IResult<IChat> result)
+        private async Task SendResult(IResult<IChat> result, string currentUserId)
         {
             if (result.IsSuccess)
             {
                 var users = result.Data.Users
-                    .Select(s => s.User.Id)
+                    .Where(w => w.User.Id != currentUserId)
+                    .Select(s => s.User.Name)
                     .ToArray();
 
-                await chatHubContext.Clients.Users(users).SendAsync("chat", result.Data);
+                var hubUsers = chatHubContext.Clients.Clients(users);
+
+                await hubUsers.SendAsync("chat", result.Data);
             }
         }
     }

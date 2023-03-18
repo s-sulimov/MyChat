@@ -78,8 +78,8 @@ namespace Sulimov.MyChat.Server.BL.Services
             
             var dbModel = new DbMessage
             {
-                Sender = sender,
-                Chat = chat,
+                SenderId = senderId,
+                ChatId = chat.Id,
                 Date = DateTime.UtcNow,
                 Text = message,
             };

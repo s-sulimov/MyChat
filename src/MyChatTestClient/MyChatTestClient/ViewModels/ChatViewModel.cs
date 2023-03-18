@@ -1,10 +1,13 @@
-﻿using Sulimov.MyChat.Client.Models;
+﻿using Microsoft.AspNetCore.SignalR.Client;
+using Sulimov.MyChat.Client.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace Sulimov.MyChat.Client.ViewModels
 {
@@ -12,16 +15,19 @@ namespace Sulimov.MyChat.Client.ViewModels
     {
         private readonly HttpClient client;
         private readonly Credentials currentCredentials;
+        private HubConnection hubConnection;
         private List<Chat> chatList = new List<Chat>();
 
-        public Action<IEnumerable<Chat>> onChatListUpdated;
+        public Action<List<Chat>> onChatListUpdated;
 
         public List<Chat> Chats { get; }
 
-        public ChatViewModel(HttpClient client, Credentials currentCredentials)
+        public ChatViewModel(HttpClient client, Credentials currentCredentials, HubConnection hubConnection)
         {
             this.client = client;
             this.currentCredentials = currentCredentials;
+            this.hubConnection = hubConnection;
+            CreateChatHubHandler();
         }
 
         public async Task<Result> GetAllUserChats()
@@ -67,34 +73,18 @@ namespace Sulimov.MyChat.Client.ViewModels
 
             var newChat = await response.Content.ReadFromJsonAsync<Chat>();
 
-            ReceieveChat(newChat);
+            chatList.Add(newChat);
+            onChatListUpdated?.Invoke(chatList);
 
             return new Result { IsSuccess = true, };
         }
 
-        public void ReceieveChat(Chat chat)
+        private void CreateChatHubHandler()
         {
-            var currentChat = chatList.FirstOrDefault(f => f.Id == chat.Id);
-            if (currentChat != null)
+            hubConnection.On<string, Chat>("chat", (user, chat) =>
             {
-                chatList.Remove(currentChat);
-            }
-
-            chatList.Add(chat);
-
-            onChatListUpdated?.Invoke(chatList);
-        }
-
-        public void RemoveChat(int chatId)
-        {
-            var chat = chatList.FirstOrDefault(f => f.Id == chatId);
-            if (chat == null)
-            {
-                return;
-            }
-
-            chatList.Remove(chat);
-            onChatListUpdated?.Invoke(chatList);
+                int a = 1;
+            });
         }
     }
 }
