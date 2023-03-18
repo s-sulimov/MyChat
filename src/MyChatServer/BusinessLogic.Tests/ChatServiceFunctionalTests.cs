@@ -133,17 +133,15 @@ namespace Sulimov.MyChat.Server.BL.FunctionalTests
         }
 
         [TestMethod]
-        [DataRow(2, "2", 0)]
-        [DataRow(2, "8", 0)]
-        [DataRow(1, "0", 3)]
-        [DataRow(1, "1", 2)]
-        public async Task GetChatUsers(int chatId, string excludeUserId, int usersCountExpected)
+        [DataRow(2, 0)]
+        [DataRow(1, 3)]
+        public async Task GetChatUsers(int chatId, int usersCountExpected)
         {
             // Arrange.
             await ResetDataBase();
 
             // Act.
-            var result = await chatService.GetChatUsers(chatId, excludeUserId);
+            var result = await chatService.GetChatUsers(chatId);
 
             // Assert.
             Assert.AreEqual(usersCountExpected, result.Count());

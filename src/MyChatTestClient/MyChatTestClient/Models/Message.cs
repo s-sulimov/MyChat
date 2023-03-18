@@ -1,4 +1,5 @@
 ﻿using System;
+
 namespace Sulimov.MyChat.Client.Models
 {
     public class Message

@@ -1,11 +1,9 @@
-﻿using Microsoft.AspNetCore.SignalR.Client;
-using Sulimov.MyChat.Client.Models;
+﻿using Sulimov.MyChat.Client.Models;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
-using System.Windows;
 
 namespace Sulimov.MyChat.Client.ViewModels
 {
@@ -13,12 +11,16 @@ namespace Sulimov.MyChat.Client.ViewModels
     {
         private readonly HttpClient client;
         private Credentials currentCredentials;
+        private bool isLoggedIn;
 
         public Credentials CurrentCredentials { get { return currentCredentials; } }
+        public bool IsLoggedIn { get { return isLoggedIn; } }
 
         public UserViewModel(HttpClient client)
         {
             this.client = client;
+            this.currentCredentials = new Credentials();
+            isLoggedIn = false;
         }
 
         public async Task<Result> Register(string userName, string password, string email)
@@ -67,12 +69,11 @@ namespace Sulimov.MyChat.Client.ViewModels
 
             var responseData = await response.Content.ReadFromJsonAsync<AuthenticationResponse>();
 
-            this.currentCredentials = new Credentials
-            {
-                Login = login,
-                Password = password,
-                Token = responseData.Token,
-            };
+            currentCredentials.Login = login;
+            currentCredentials.Password = password;
+            currentCredentials.Token = responseData.Token;
+
+            isLoggedIn = true;
 
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(Constants.AuthMethod, this.currentCredentials.Token);
             var userResponse = await client.GetAsync($"{Constants.ApiUrl}users?name={data.Login}");
@@ -83,8 +84,8 @@ namespace Sulimov.MyChat.Client.ViewModels
             }
 
             var user = await userResponse.Content.ReadFromJsonAsync<User>();
-            this.currentCredentials.Id = user.Id;
-            this.currentCredentials.Email = user.Email;
+            currentCredentials.Id = user.Id;
+            currentCredentials.Email = user.Email;
 
             return new Result { IsSuccess = true };
         }
