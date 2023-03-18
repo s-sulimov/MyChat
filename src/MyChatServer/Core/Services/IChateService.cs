@@ -63,8 +63,7 @@ namespace Sulimov.MyChat.Server.Core.Services
         /// Get all chat's users.
         /// </summary>
         /// <param name="chatId">Chat ID.</param>
-        /// <param name="excludeUserId">Excluded user ID.</param>
         /// <returns>All chat's users.</returns>
-        Task<IEnumerable<string>> GetChatUsers(int chatId, string excludeUserId);
+        Task<IEnumerable<string>> GetChatUsers(int chatId);
     }
 }

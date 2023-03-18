@@ -84,7 +84,7 @@ namespace Sulimov.MyChat.Server.Controllers
 
             if (result.IsSuccess)
             {
-                var users = await chatService.GetChatUsers(message.ChatId, userId);
+                var users = await chatService.GetChatUsers(message.ChatId);
                 await chatHubContext.Clients.Users(users).SendAsync("message", result.Data);
             }
 
