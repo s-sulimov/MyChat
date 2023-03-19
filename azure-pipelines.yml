@@ -25,6 +25,12 @@ stages:
         command: 'test'
         projects: '**/*.[Tt]est*/*.csproj'
         arguments: '--configuration $(BuildConfiguration)'
+    - task: FileTransform@1
+      displayName: Set configuration values
+      inputs:
+        folderPath: '$(System.DefaultWorkingDirectory)/**/'
+        fileType: 'json'
+        targetFiles: '**/appsettings.json'
 
     - task: Docker@2
       displayName: Build and Push container
