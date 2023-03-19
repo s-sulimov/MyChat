@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
 using Sulimov.MyChat.Server.BL.Services;
 using Sulimov.MyChat.Server.Core.Services;
 using Sulimov.MyChat.Server.DAL;
@@ -24,6 +25,14 @@ namespace Sulimov.MyChat.Server
         public void ConfigureServices(IServiceCollection services)
         {
             var connectionString = configuration.GetConnectionString("DefaultConnection");
+            Log.Logger.Information($"Connection string from appsetting: {connectionString}");
+
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING") ?? string.Empty;
+                Log.Logger.Information($"Connection string from environment: {connectionString}");
+            }
+
             services.AddDbContext<DataContext>(opt => opt.UseSqlServer(connectionString));
 
             services
