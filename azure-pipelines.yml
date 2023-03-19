@@ -1,11 +1,13 @@
 trigger:
 - master
 
+name: "1.0.$(Year:yy)$(DayOfYear).$(Rev:r)"
+
 resources:
 - repo: self
 
 variables:
-  tag: '$(Build.BuildId)'
+  tag: '$(Build.BuildNumber)'
 
 stages:
 - stage: Build
