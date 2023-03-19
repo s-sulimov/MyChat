@@ -13,8 +13,20 @@ stages:
 - stage: Build
   displayName: Build image
   jobs:
-  - job: Build
-    displayName: Build
+  - job: Test
+    displayName: Test
+    pool:
+      vmImage: ubuntu-latest
+    steps:
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: 'test'
+        projects: '**/*.[Tt]est*/*.csproj'
+        publishTestResults: true
+        arguments: '--configuration $(buildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura'
+
+  - job: BuildAndPublish
+    displayName: Build and Publish
     pool:
       vmImage: ubuntu-latest
     steps:
