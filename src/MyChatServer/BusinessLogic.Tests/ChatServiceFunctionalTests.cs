@@ -40,10 +40,10 @@ namespace Sulimov.MyChat.Server.BL.FunctionalTests
         }
 
         [TestMethod]
-        [DataRow("New chat", new string[] { "1", "2", "8" }, "3", false)]
-        [DataRow("New chat", new string[] { "1", "2" }, "8", false)]
-        [DataRow("New chat", new string[] { }, "3", false)]
-        [DataRow("New chat", new string[] { "1", "2" }, "3", true)]
+        [DataRow("New chat 1", new string[] { "1", "2", "8" }, "3", false)]
+        [DataRow("New chat 2", new string[] { "1", "2" }, "8", false)]
+        [DataRow("New chat 3", new string[] { }, "3", false)]
+        [DataRow("New chat 4", new string[] { "1", "2" }, "3", true)]
         public async Task CreateChat(string title, IEnumerable<string> userIds, string ownerId, bool expected)
         {
             // Arrange.

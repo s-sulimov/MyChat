@@ -44,6 +44,11 @@ namespace Sulimov.MyChat.Server.BL.Services
                 .Where(w => w.Id == ownerId || userIds.Contains(w.Id))
                 .ToArrayAsync();
 
+            if (!userIds.Any())
+            {
+                return new Result<IChat>(ResultStatus.InconsistentData, Chat.Instance, "Chat hasn't any user.");
+            }
+
             var sb = new StringBuilder();
 
             foreach (string userId in userIds)

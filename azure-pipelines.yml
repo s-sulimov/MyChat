@@ -11,26 +11,23 @@ variables:
 
 stages:
 - stage: Build
-  displayName: Build image
+  displayName: Build an image
   jobs:
-  - job: Test
-    displayName: Test
-    pool:
-      vmImage: ubuntu-latest
-    steps:
-    - task: DotNetCoreCLI@2
-      inputs:
-        command: 'test'
-        projects: '**/*.[Tt]est*/*.csproj'
-        publishTestResults: true
-        arguments: '--configuration $(buildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura'
-
   - job: BuildAndPublish
     displayName: Build and Publish
     pool:
       vmImage: ubuntu-latest
     steps:
+    - task: DotNetCoreCLI@2
+      displayName: Test
+      inputs:
+        version: 6.0.x
+        command: 'test'
+        projects: '**/*.[Tt]est*/*.csproj'
+        arguments: '--configuration $(BuildConfiguration)'
+
     - task: Docker@2
+      displayName: Build and Push container
       inputs:
         containerRegistry: 'MyDockerHub'
         repository: 'slim1985/my-chat-server'
