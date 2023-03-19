@@ -5,6 +5,8 @@ services:
     build: /MyChatServer
     ports:
       - "80:80"
+    environment:
+      - CONNECTION_STRING=Server=db;Database=myChat;User=sa;Password=S3cur3P@ssW0rd!;TrustServerCertificate=Yes;
     depends_on:
       - db
 
@@ -16,7 +18,7 @@ services:
       - "1433:1433"
     environment:
       ACCEPT_EULA: "Y"
-      SA_PASSWORD: "<MySecurePassword>"
+      SA_PASSWORD: "S3cur3P@ssW0rd!"
 
 volumes:
   sqlDB:

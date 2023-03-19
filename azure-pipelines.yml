@@ -13,11 +13,13 @@ stages:
 - stage: Build
   displayName: Build an image
   jobs:
+
   - job: BuildAndPublish
     displayName: Build and Publish
     pool:
       vmImage: ubuntu-latest
     steps:
+
     - task: DotNetCoreCLI@2
       displayName: Test
       inputs:
