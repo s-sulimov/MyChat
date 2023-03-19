@@ -23,5 +23,6 @@
 **/secrets.dev.yaml
 **/values.dev.yaml
 **/appsettings.Development.json
+**/*.Tests
 LICENSE
 README.md

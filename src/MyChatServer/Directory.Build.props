@@ -1,6 +1,7 @@
 <Project>
   <PropertyGroup>
     <AnalysisMode>Recommended</AnalysisMode>
-	<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <AnalysisModeSecurity>All</AnalysisModeSecurity>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 </Project>
