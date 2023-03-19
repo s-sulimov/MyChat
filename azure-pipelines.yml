@@ -25,6 +25,7 @@ stages:
         command: 'test'
         projects: '**/*.[Tt]est*/*.csproj'
         arguments: '--configuration $(BuildConfiguration)'
+
     - task: FileTransform@1
       displayName: Set configuration values
       inputs:
