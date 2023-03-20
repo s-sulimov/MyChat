@@ -7,6 +7,7 @@ using Sulimov.MyChat.Server.Core.Services;
 using Sulimov.MyChat.Server.Helpers;
 using Sulimov.MyChat.Server.Hubs;
 using Sulimov.MyChat.Server.Models;
+using Sulimov.MyChat.Server.Models.Responses;
 
 namespace Sulimov.MyChat.Server.Controllers
 {
@@ -29,7 +30,7 @@ namespace Sulimov.MyChat.Server.Controllers
         // api/chats
         [HttpGet]
         [Produces("application/json")]
-        public async Task<ActionResult<IEnumerable<IChat>>> GetChats()
+        public async Task<ActionResult<IEnumerable<ChatDto>>> GetChats()
         {
             var userId = ControllerHelper.GetCurrentUserId(httpContextAccessor);
             if (string.IsNullOrEmpty(userId))
@@ -39,13 +40,13 @@ namespace Sulimov.MyChat.Server.Controllers
 
             var result = await chatService.GetUserChats(userId);
 
-            return ResultHelper.CreateHttpResult(this, result);
+            return ResultHelper.CreateHttpResultFromData<IEnumerable<ChatDto>>(this, result.Status, result.Message, result.Data);
         }
 
         // api/chats
         [HttpPost]
         [Produces("application/json")]
-        public async Task<ActionResult<IChat>> CreateChat(CreateChatRequest request)
+        public async Task<ActionResult<ChatDto>> CreateChat(CreateChatRequest request)
         {
             if (!ModelState.IsValid)
             {
@@ -62,13 +63,13 @@ namespace Sulimov.MyChat.Server.Controllers
 
             await SendResult(result);
 
-            return ResultHelper.CreateHttpResult(this, result);
+            return ResultHelper.CreateHttpResultFromData<ChatDto>(this, result.Status, result.Message, result.Data);
         }
 
         // api/chats/add-user
         [HttpPut("add-user")]
         [Produces("application/json")]
-        public async Task<ActionResult<IChat>> AddUserToChat(UpdateChatUserRequest request)
+        public async Task<ActionResult<ChatDto>> AddUserToChat(UpdateChatUserRequest request)
         {
             if (!ModelState.IsValid)
             {
@@ -85,13 +86,13 @@ namespace Sulimov.MyChat.Server.Controllers
 
             await SendResult(result);
 
-            return ResultHelper.CreateHttpResult(this, result);
+            return ResultHelper.CreateHttpResultFromData<ChatDto>(this, result.Status, result.Message, result.Data);
         }
 
         // api/chats/remove-user
         [HttpPut("remove-user")]
         [Produces("application/json")]
-        public async Task<ActionResult<IChat>> RemoveUserFromChat(UpdateChatUserRequest request)
+        public async Task<ActionResult<ChatDto>> RemoveUserFromChat(UpdateChatUserRequest request)
         {
             if (!ModelState.IsValid)
             {
@@ -111,13 +112,13 @@ namespace Sulimov.MyChat.Server.Controllers
                 await chatHubContext.Clients.Users(request.UserId).SendAsync("remove-user-from-chat", result.Data.Id);
             }
 
-            return ResultHelper.CreateHttpResult(this, result);
+            return ResultHelper.CreateHttpResultFromData<ChatDto>(this, result.Status, result.Message, result.Data);
         }
 
         // api/chats/set-admin
         [HttpPut("set-admin")]
         [Produces("application/json")]
-        public async Task<ActionResult<IChat>> SetChatAdmin(UpdateChatUserRequest request)
+        public async Task<ActionResult<ChatDto>> SetChatAdmin(UpdateChatUserRequest request)
         {
             if (!ModelState.IsValid)
             {
@@ -134,13 +135,13 @@ namespace Sulimov.MyChat.Server.Controllers
 
             await SendResult(result);
 
-            return ResultHelper.CreateHttpResult(this, result);
+            return ResultHelper.CreateHttpResultFromData<ChatDto>(this, result.Status, result.Message, result.Data);
         }
 
         // api/chats/remove-admin
         [HttpPut("remove-admin")]
         [Produces("application/json")]
-        public async Task<ActionResult<IChat>> RemoveChatAdmin(UpdateChatUserRequest request)
+        public async Task<ActionResult<ChatDto>> RemoveChatAdmin(UpdateChatUserRequest request)
         {
             if (!ModelState.IsValid)
             {
@@ -157,7 +158,7 @@ namespace Sulimov.MyChat.Server.Controllers
 
             await SendResult(result);
 
-            return ResultHelper.CreateHttpResult(this, result);
+            return ResultHelper.CreateHttpResultFromData<ChatDto>(this, result.Status, result.Message, result.Data);
         }
 
         private async Task SendResult(IResult<IChat> result)
@@ -168,7 +169,7 @@ namespace Sulimov.MyChat.Server.Controllers
                     .Select(s => s.User.Id)
                     .ToArray();
 
-                await chatHubContext.Clients.Users(users).SendAsync("chat", result.Data);
+                await chatHubContext.Clients.Users(users).SendAsync("chat", ResultHelper.ConvertChat(result.Data));
             }
         }
     }

@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Sulimov.MyChat.Server.Core;
-using Sulimov.MyChat.Server.Core.Models;
 using Sulimov.MyChat.Server.Core.Services;
 using Sulimov.MyChat.Server.Helpers;
 using Sulimov.MyChat.Server.Models;
@@ -32,18 +31,18 @@ namespace Sulimov.MyChat.Server.Controllers
         // api/users
         [HttpGet]
         [Produces("application/json")]
-        public async Task<ActionResult<IUser>> GetUser(string name)
+        public async Task<ActionResult<UserDto>> GetUser(string name)
         {
             var result = await userService.GetUser(name);
 
-            return ResultHelper.CreateHttpResult(this, result);
+            return ResultHelper.CreateHttpResultFromData<UserDto>(this, result.Status, result.Message, result.Data);
         }
 
         // api/users/create
         [HttpPost("create")]
         [AllowAnonymous]
         [Produces("application/json")]
-        public async Task<ActionResult<IUser>> CreateUser(CreateUserRequest request)
+        public async Task<ActionResult<UserDto>> CreateUser(CreateUserRequest request)
         {
             if (!ModelState.IsValid)
             {
@@ -52,7 +51,7 @@ namespace Sulimov.MyChat.Server.Controllers
 
             var result = await userService.CreateUser(request.Name, request.Email, request.Password);
 
-            return ResultHelper.CreateHttpResult(this, result);
+            return ResultHelper.CreateHttpResultFromData<UserDto>(this, result.Status, result.Message, result.Data);
         }
 
         // api/users/login
@@ -68,13 +67,13 @@ namespace Sulimov.MyChat.Server.Controllers
 
             var result = await authentificationService.Login(request.Login, request.Password);
 
-            return ResultHelper.CreateHttpResult(this, result);
+            return ResultHelper.CreateHttpResultFromData<AuthenticationResponse>(this, result.Status, result.Message, result.Data);
         }
 
         // api/users/change-email
         [HttpPatch("change-email")]
         [Produces("application/json")]
-        public async Task<ActionResult<IUser>> ChangeEmail(ChangeUserEmailRequest request)
+        public async Task<ActionResult<UserDto>> ChangeEmail(ChangeUserEmailRequest request)
         {
             if (!ModelState.IsValid)
             {
@@ -89,13 +88,13 @@ namespace Sulimov.MyChat.Server.Controllers
 
             var result = await userService.ChangeEmail(userId, request.Password, request.Email);
 
-            return ResultHelper.CreateHttpResult(this, result);
+            return ResultHelper.CreateHttpResultFromData<UserDto>(this, result.Status, result.Message, result.Data);
         }
 
         // api/users/change-password
         [HttpPatch("change-password")]
         [Produces("application/json")]
-        public async Task<ActionResult<IUser>> ChangePassword(ChangeUserPasswordRequest request)
+        public async Task<ActionResult<UserDto>> ChangePassword(ChangeUserPasswordRequest request)
         {
             if (!ModelState.IsValid)
             {
@@ -110,7 +109,7 @@ namespace Sulimov.MyChat.Server.Controllers
 
             var result = await userService.ChangePassword(userId, request.CurrentPassword, request.NewPassword);
 
-            return ResultHelper.CreateHttpResult(this, result);
+            return ResultHelper.CreateHttpResultFromData<UserDto>(this, result.Status, result.Message, result.Data);
         }
     }
 }
