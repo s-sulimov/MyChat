@@ -3,31 +3,31 @@
     /// <summary>
     /// Chat message.
     /// </summary>
-    public interface IMessage
+    public class Message
     {
         /// <summary>
         /// Identifier.
         /// </summary>
-        int Id { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         /// Mesaage date and time.
         /// </summary>
-        DateTime DateTime { get; set; }
+        public DateTimeOffset DateTime { get; set; }
 
         /// <summary>
         /// Chat ID.
         /// </summary>
-        int ChatId { get; set; }
+        public int ChatId { get; set; }
 
         /// <summary>
         /// Sender.
         /// </summary>
-        IUser Sender { get; set; }
+        public User Sender { get; set; } = new User();
 
         /// <summary>
         /// Message text.
         /// </summary>
-        string Text { get; set; }
+        public string Text { get; set; } = string.Empty;
     }
 }

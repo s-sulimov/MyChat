@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Sulimov.MyChat.Server.Core;
+using Sulimov.MyChat.Server.Core.Models;
 using Sulimov.MyChat.Server.Core.Services;
 using Sulimov.MyChat.Server.Helpers;
 using Sulimov.MyChat.Server.Models;
@@ -35,7 +36,7 @@ namespace Sulimov.MyChat.Server.Controllers
         {
             var result = await userService.GetUser(name);
 
-            return ResultHelper.CreateHttpResultFromData<UserDto>(this, result.Status, result.Message, result.Data);
+            return ResultHelper.CreateHttpResult<User, UserDto>(this, result);
         }
 
         // api/users/create
@@ -51,7 +52,7 @@ namespace Sulimov.MyChat.Server.Controllers
 
             var result = await userService.CreateUser(request.Name, request.Email, request.Password);
 
-            return ResultHelper.CreateHttpResultFromData<UserDto>(this, result.Status, result.Message, result.Data);
+            return ResultHelper.CreateHttpResult<User, UserDto>(this, result);
         }
 
         // api/users/login
@@ -67,7 +68,7 @@ namespace Sulimov.MyChat.Server.Controllers
 
             var result = await authentificationService.Login(request.Login, request.Password);
 
-            return ResultHelper.CreateHttpResultFromData<AuthenticationResponse>(this, result.Status, result.Message, result.Data);
+            return ResultHelper.CreateHttpResult<AuthenticationResponse, AuthenticationResponse>(this, result);
         }
 
         // api/users/change-email
@@ -88,7 +89,7 @@ namespace Sulimov.MyChat.Server.Controllers
 
             var result = await userService.ChangeEmail(userId, request.Password, request.Email);
 
-            return ResultHelper.CreateHttpResultFromData<UserDto>(this, result.Status, result.Message, result.Data);
+            return ResultHelper.CreateHttpResult<User, UserDto>(this, result);
         }
 
         // api/users/change-password
@@ -109,7 +110,7 @@ namespace Sulimov.MyChat.Server.Controllers
 
             var result = await userService.ChangePassword(userId, request.CurrentPassword, request.NewPassword);
 
-            return ResultHelper.CreateHttpResultFromData<UserDto>(this, result.Status, result.Message, result.Data);
+            return ResultHelper.CreateHttpResult<User, UserDto>(this, result);
         }
     }
 }

@@ -3,21 +3,21 @@
     /// <summary>
     /// Chat user item.
     /// </summary>
-    public interface IChatUser
+    public class ChatUser
     {
         /// <summary>
         /// Identifier.
         /// </summary>
-        int Id { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         /// Chat user.
         /// </summary>
-        IUser User { get; set; }
+        public User User { get; set; } = new User();
 
         /// <summary>
         /// User role.
         /// </summary>
-        IChatRole Role { get; set; }
+        public ChatRole Role { get; set; } = new ChatRole();
     }
 }

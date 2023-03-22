@@ -3,21 +3,21 @@
     /// <summary>
     /// Chat.
     /// </summary>
-    public interface IChat
+    public class Chat
     {
         /// <summary>
         /// Chat ID.
         /// </summary>
-        int Id { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         /// Chat title.
         /// </summary>
-        string Title { get; set; }
+        public string Title { get; set; } = string.Empty;
 
         /// <summary>
         /// Chat users.
         /// </summary>
-        IEnumerable<IChatUser> Users { get; set; }
+        public IEnumerable<ChatUser> Users { get; set; } = Array.Empty<ChatUser>();
     }
 }

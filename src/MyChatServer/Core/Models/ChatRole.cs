@@ -3,16 +3,16 @@
     /// <summary>
     /// Chat role.
     /// </summary>
-    public interface IChatRole
+    public class ChatRole
     {
         /// <summary>
         /// Identifier.
         /// </summary>
-        int Id { get; set; }
+        public int Id { get; set; }
 
         /// <summary>
         /// Role name.
         /// </summary>
-        string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
     }
 }

@@ -2,19 +2,30 @@
 
 namespace Sulimov.MyChat.Server.Core.Models
 {
-    /// <inheritdoc/>
-    public class Result<T> : IResult<T> where T : class
+    /// <summary>
+    /// Service result.
+    /// </summary>
+    /// <typeparam name="T">Type of result object.</typeparam>
+    public class Result<T> where T : class
     {
-        /// <inheritdoc/>
+        /// <summary>
+        /// Result status.
+        /// </summary>
         public ResultStatus Status { get; set; }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Result data.
+        /// </summary>
         public T Data { get; set; }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Result message.
+        /// </summary>
         public string Message { get; set; }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Success result.
+        /// </summary>
         public bool IsSuccess => Status == ResultStatus.Success;
 
         public Result(ResultStatus status, T data)

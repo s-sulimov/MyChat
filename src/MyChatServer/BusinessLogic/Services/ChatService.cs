@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Sulimov.MyChat.Server.BL.Models;
 using Sulimov.MyChat.Server.Core;
 using Sulimov.MyChat.Server.Core.Enums;
 using Sulimov.MyChat.Server.Core.Models;
@@ -22,7 +21,7 @@ namespace Sulimov.MyChat.Server.BL.Services
         }
 
         /// <inheritdoc/>
-        public async Task<IResult<IEnumerable<IChat>>> GetUserChats(string userId)
+        public async Task<Result<IEnumerable<Chat>>> GetUserChats(string userId)
         {
             var result = await dbContext.Chats
                 .Include(i => i.Users)
@@ -30,15 +29,15 @@ namespace Sulimov.MyChat.Server.BL.Services
                 .Include(i => i.Users)
                     .ThenInclude(t => t.Role)
                 .Where(w => w.Users.Any(a => a.User.Id == userId))
-                .Select(s => new Chat(s))
+                .Select(s => CreateChat(s))
                 .ToArrayAsync();
 
 
-            return new Result<IEnumerable<IChat>>(ResultStatus.Success, result);
+            return new Result<IEnumerable<Chat>>(ResultStatus.Success, result);
         }
 
         /// <inheritdoc/>
-        public async Task<IResult<IChat>> CreateChat(string title, IEnumerable<string> userIds, string ownerId)
+        public async Task<Result<Chat>> CreateChat(string title, IEnumerable<string> userIds, string ownerId)
         {
             var dbUsers = await dbContext.Users
                 .Where(w => w.Id == ownerId || userIds.Contains(w.Id))
@@ -46,7 +45,7 @@ namespace Sulimov.MyChat.Server.BL.Services
 
             if (!userIds.Any())
             {
-                return new Result<IChat>(ResultStatus.InconsistentData, Chat.Instance, "Chat hasn't any user.");
+                return new Result<Chat>(ResultStatus.InconsistentData, new Chat(), "Chat hasn't any user.");
             }
 
             var sb = new StringBuilder();
@@ -67,7 +66,7 @@ namespace Sulimov.MyChat.Server.BL.Services
 
             if (sb.Length > 0)
             {
-                return new Result<IChat>(ResultStatus.ObjectNotFound, Chat.Instance, sb.ToString());
+                return new Result<Chat>(ResultStatus.ObjectNotFound, new Chat(), sb.ToString());
             }
 
             var dbChat = new DbChat
@@ -80,7 +79,7 @@ namespace Sulimov.MyChat.Server.BL.Services
             var roleUser = await dbContext.ChatRoles.FirstOrDefaultAsync(f => f.Name == Constants.ChatUserRoleName);
             if (roleOwner == null || roleUser == null)
             {
-                return new Result<IChat>(ResultStatus.UnhandledError, Chat.Instance, Constants.UnknownErrorMessage);
+                return new Result<Chat>(ResultStatus.UnhandledError, new Chat(), Constants.UnknownErrorMessage);
             }
 
             dbChat.Users.Add(new DbChatUser
@@ -101,7 +100,7 @@ namespace Sulimov.MyChat.Server.BL.Services
                 var user = dbUsers.FirstOrDefault(f => f.Id == userId);
                 if (user == null)
                 {
-                    return new Result<IChat>(ResultStatus.UnhandledError, Chat.Instance, Constants.UnknownErrorMessage);
+                    return new Result<Chat>(ResultStatus.UnhandledError, new Chat(), Constants.UnknownErrorMessage);
                 }
 
                 var dbChatUser = new DbChatUser
@@ -116,15 +115,15 @@ namespace Sulimov.MyChat.Server.BL.Services
             dbContext.Add(dbChat);
             await dbContext.SaveChangesAsync();
 
-            return new Result<IChat>(ResultStatus.Success, new Chat(dbChat));
+            return new Result<Chat>(ResultStatus.Success, CreateChat(dbChat));
         }
 
         /// <inheritdoc/>
-        public async Task<IResult<IChat>> AddUserToChat(int chatId, string currentUserId, string userId)
+        public async Task<Result<Chat>> AddUserToChat(int chatId, string currentUserId, string userId)
         {
             if (currentUserId == userId)
             {
-                return new Result<IChat>(ResultStatus.InconsistentData, Chat.Instance, "You can't add yourself");
+                return new Result<Chat>(ResultStatus.InconsistentData, new Chat(), "You can't add yourself");
             }
             
             var chat = await dbContext.Chats
@@ -136,25 +135,25 @@ namespace Sulimov.MyChat.Server.BL.Services
 
             if (chat == null)
             {
-                return new Result<IChat>(ResultStatus.ObjectNotFound, Chat.Instance, $"Chat {chatId} not found.");
+                return new Result<Chat>(ResultStatus.ObjectNotFound, new Chat(), $"Chat {chatId} not found.");
             }
 
             var user = await dbContext.Users.FirstOrDefaultAsync(f => f.Id == userId);
             if (user == null)
             {
-                return new Result<IChat>(ResultStatus.ObjectNotFound, Chat.Instance, $"User {userId} not found.");
+                return new Result<Chat>(ResultStatus.ObjectNotFound, new Chat(), $"User {userId} not found.");
             }
 
             var chatUser = chat.Users.FirstOrDefault(f => f.User.Id == currentUserId);
             if (chatUser == null || chatUser.Role.Name == Constants.ChatUserRoleName)
             {
-                return new Result<IChat>(ResultStatus.AccessDenied, Chat.Instance, $"Current user doesn't have permission.");
+                return new Result<Chat>(ResultStatus.AccessDenied, new Chat(), $"Current user doesn't have permission.");
             }
 
             var role = await dbContext.ChatRoles.FirstOrDefaultAsync(f => f.Name == Constants.ChatUserRoleName);
             if (role == null)
             {
-                return new Result<IChat>(ResultStatus.UnhandledError, Chat.Instance, Constants.UnknownErrorMessage);
+                return new Result<Chat>(ResultStatus.UnhandledError, new Chat(), Constants.UnknownErrorMessage);
             }
 
             chat.Users.Add(new DbChatUser
@@ -165,11 +164,11 @@ namespace Sulimov.MyChat.Server.BL.Services
 
             await dbContext.SaveChangesAsync();
 
-            return new Result<IChat>(ResultStatus.Success, new Chat(chat));
+            return new Result<Chat>(ResultStatus.Success, CreateChat(chat));
         }
 
         /// <inheritdoc/>
-        public async Task<IResult<IChat>> RemoveUserFromChat(int chatId, string currentUserId, string userId)
+        public async Task<Result<Chat>> RemoveUserFromChat(int chatId, string currentUserId, string userId)
         {
             var chat = await dbContext.Chats
                 .Include(i => i.Users)
@@ -180,33 +179,33 @@ namespace Sulimov.MyChat.Server.BL.Services
 
             if (chat == null)
             {
-                return new Result<IChat>(ResultStatus.ObjectNotFound, Chat.Instance, $"Chat {chatId} not found.");
+                return new Result<Chat>(ResultStatus.ObjectNotFound, new Chat(), $"Chat {chatId} not found.");
             }
 
             var user = chat.Users.FirstOrDefault(f => f.User.Id == userId);
             if (user == null || user.Role.Name == Constants.ChatOwnerRoleName)
             {
-                return new Result<IChat>(ResultStatus.AccessDenied, Chat.Instance, $"User {userId} doesn't include in the chat {chatId}.");
+                return new Result<Chat>(ResultStatus.AccessDenied, new Chat(), $"User {userId} doesn't include in the chat {chatId}.");
             }
 
             var currentUser = chat.Users.FirstOrDefault(f => f.User.Id == currentUserId);
             if (currentUser == null || currentUser.Role.Name == Constants.ChatUserRoleName)
             {
-                return new Result<IChat>(ResultStatus.AccessDenied, Chat.Instance, $"Current user doesn't have permission.");
+                return new Result<Chat>(ResultStatus.AccessDenied, new Chat(), $"Current user doesn't have permission.");
             }
 
             chat.Users.Remove(user);
             await dbContext.SaveChangesAsync();
 
-            return new Result<IChat>(ResultStatus.Success, new Chat(chat));
+            return new Result<Chat>(ResultStatus.Success, CreateChat(chat));
         }
 
         /// <inheritdoc/>
-        public async Task<IResult<IChat>> SetChatAdmin(int chatId, string currentUserId, string userId)
+        public async Task<Result<Chat>> SetChatAdmin(int chatId, string currentUserId, string userId)
         {
             if (currentUserId == userId)
             {
-                return new Result<IChat>(ResultStatus.InconsistentData, Chat.Instance, "You can't add yourself");
+                return new Result<Chat>(ResultStatus.InconsistentData, new Chat(), "You can't add yourself");
             }
 
             var chat = await dbContext.Chats
@@ -218,35 +217,35 @@ namespace Sulimov.MyChat.Server.BL.Services
 
             if (chat == null)
             {
-                return new Result<IChat>(ResultStatus.ObjectNotFound, Chat.Instance, $"Chat {chatId} not found.");
+                return new Result<Chat>(ResultStatus.ObjectNotFound, new Chat(), $"Chat {chatId} not found.");
             }
 
             var user = chat.Users.FirstOrDefault(f => f.User.Id == userId);
             if (user == null)
             {
-                return new Result<IChat>(ResultStatus.AccessDenied, Chat.Instance, $"User {userId} doesn't include in the chat {chatId}.");
+                return new Result<Chat>(ResultStatus.AccessDenied, new Chat(), $"User {userId} doesn't include in the chat {chatId}.");
             }
 
             var currentUser = chat.Users.FirstOrDefault(f => f.User.Id == currentUserId);
             if (currentUser == null || currentUser.Role.Name != Constants.ChatOwnerRoleName)
             {
-                return new Result<IChat>(ResultStatus.AccessDenied, Chat.Instance, $"Current user doesn't have permission.");
+                return new Result<Chat>(ResultStatus.AccessDenied, new Chat(), $"Current user doesn't have permission.");
             }
 
             var newRole = await dbContext.ChatRoles.FirstOrDefaultAsync(f => f.Name == Constants.ChatAdminRoleName);
             if (newRole == null)
             {
-                return new Result<IChat>(ResultStatus.UnhandledError, Chat.Instance, Constants.UnknownErrorMessage);
+                return new Result<Chat>(ResultStatus.UnhandledError, new Chat(), Constants.UnknownErrorMessage);
             }
 
             user.Role = newRole;
             await dbContext.SaveChangesAsync();
 
-            return new Result<IChat>(ResultStatus.Success, new Chat(chat));
+            return new Result<Chat>(ResultStatus.Success, CreateChat(chat));
         }
 
         /// <inheritdoc/>
-        public async Task<IResult<IChat>> RemoveChatAdmin(int chatId, string currentUserId, string userId)
+        public async Task<Result<Chat>> RemoveChatAdmin(int chatId, string currentUserId, string userId)
         {
             var chat = await dbContext.Chats
                 .Include(i => i.Users)
@@ -257,31 +256,31 @@ namespace Sulimov.MyChat.Server.BL.Services
 
             if (chat == null)
             {
-                return new Result<IChat>(ResultStatus.ObjectNotFound, Chat.Instance, $"Chat {chatId} not found.");
+                return new Result<Chat>(ResultStatus.ObjectNotFound, new Chat(), $"Chat {chatId} not found.");
             }
 
             var user = chat.Users.FirstOrDefault(f => f.User.Id == userId);
             if (user == null)
             {
-                return new Result<IChat>(ResultStatus.AccessDenied, Chat.Instance, $"User {userId} doesn't include in the chat {chatId}.");
+                return new Result<Chat>(ResultStatus.AccessDenied, new Chat(), $"User {userId} doesn't include in the chat {chatId}.");
             }
 
             var currentUser = chat.Users.FirstOrDefault(f => f.User.Id == currentUserId);
             if (currentUser == null || currentUser.Role.Name != Constants.ChatOwnerRoleName)
             {
-                return new Result<IChat>(ResultStatus.AccessDenied, Chat.Instance, $"Current user doesn't have permission.");
+                return new Result<Chat>(ResultStatus.AccessDenied, new Chat(), $"Current user doesn't have permission.");
             }
 
             var newRole = await dbContext.ChatRoles.FirstOrDefaultAsync(f => f.Name == Constants.ChatUserRoleName);
             if (newRole == null)
             {
-                return new Result<IChat>(ResultStatus.UnhandledError, Chat.Instance, Constants.UnknownErrorMessage);
+                return new Result<Chat>(ResultStatus.UnhandledError, new Chat(), Constants.UnknownErrorMessage);
             }
 
             user.Role = newRole;
             await dbContext.SaveChangesAsync();
 
-            return new Result<IChat>(ResultStatus.Success, new Chat(chat));
+            return new Result<Chat>(ResultStatus.Success, CreateChat(chat));
         }
 
         public async Task<IEnumerable<string>> GetChatUsers(int chatId)
@@ -299,6 +298,32 @@ namespace Sulimov.MyChat.Server.BL.Services
             return chat.Users
                 .Select(s => s.User.Id)
                 .ToArray();
+        }
+
+        public static Chat CreateChat(DbChat chat)
+        {
+            return new Chat
+            {
+                Id = chat.Id,
+                Title = chat.Title,
+                Users = chat.Users
+                    .Select(s => new ChatUser
+                    {
+                        Id = s.Id,
+                        Role = new ChatRole
+                        {
+                            Id = s.Role.Id,
+                            Name = s.Role.Name,
+                        },
+                        User = new User
+                        {
+                            Id = s.User.Id,
+                            Name = s.User.UserName,
+                            Email = s.User.Email,
+                        }
+                    })
+                    .ToArray(),
+            };
         }
     }
 }

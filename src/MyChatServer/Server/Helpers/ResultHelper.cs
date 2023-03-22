@@ -14,40 +14,39 @@ namespace Sulimov.MyChat.Server.Helpers
         /// <summary>
         /// Create HTTP response.
         /// </summary>
-        /// <typeparam name="T">Type of result object.</typeparam>
+        /// <typeparam name="TIn">Type of result object.</typeparam>
+        /// <typeparam name="TOut">Type of output object.</typeparam>
         /// <param name="controller">Controller.</param>
-        /// <param name="status">Result status.</param>
-        /// <param name="message">Result message</param>
-        /// <param name="data">Result data.</param>
-        /// <returns>Instance of <see cref="ActionResult{TValue}"/>.</returns>
-        /// <exception cref="InvalidEnumArgumentException"></exception>
-        public static ActionResult<T> CreateHttpResultFromData<T>(ControllerBase controller, ResultStatus status, string message, object data) where T : class
+        /// <param name="result">Service result.</param>
+        /// <returns>Instance of <see cref="ActionResult{TOut}"/>.</returns>
+        /// <exception cref="InvalidEnumArgumentException">Unknown result status.</exception>
+        public static ActionResult<TOut> CreateHttpResult<TIn, TOut>(ControllerBase controller, Result<TIn> result) where TIn : class
         {
             controller.HttpContext.Response.ContentType = "application/json";
 
-            switch (status)
+            switch (result.Status)
             {
                 case ResultStatus.Success:
-                    return controller.Ok(ConvertData<T>(data));
+                    return controller.Ok(ConvertData<TOut>(result.Data));
                 case ResultStatus.InconsistentData:
-                    return controller.BadRequest(message);
+                    return controller.BadRequest(result.Message);
                 case ResultStatus.ObjectNotFound:
-                    return controller.NotFound(message);
+                    return controller.NotFound(result.Message);
                 case ResultStatus.AccessDenied:
-                    return controller.Forbid(message);
+                    return controller.Forbid(result.Message);
                 case ResultStatus.UnhandledError:
-                    return controller.StatusCode(500, message);
+                    return controller.StatusCode(500, result.Message);
                 default:
                     throw new InvalidEnumArgumentException();
             }
         }
 
         /// <summary>
-        /// Convert <see cref="IUser"/> instance to instance of <see cref="UserDto"/>.
+        /// Convert <see cref="User"/> instance to instance of <see cref="UserDto"/>.
         /// </summary>
-        /// <param name="user"><see cref="IUser"/> instance.</param>
+        /// <param name="user"><see cref="User"/> instance.</param>
         /// <returns>Instance of <see cref="UserDto"/>.</returns>
-        public static UserDto ConvertUser(IUser user)
+        public static UserDto ConvertUser(User user)
         {
             return new UserDto
             {
@@ -58,11 +57,11 @@ namespace Sulimov.MyChat.Server.Helpers
         }
 
         /// <summary>
-        /// Convert <see cref="IMessage"/> instance to instance of <see cref="MessageDto"/>.
+        /// Convert <see cref="Message"/> instance to instance of <see cref="MessageDto"/>.
         /// </summary>
-        /// <param name="message"><see cref="IMessage"/> instance.</param>
+        /// <param name="message"><see cref="Message"/> instance.</param>
         /// <returns>Instance of <see cref="MessageDto"/>.</returns>
-        public static MessageDto ConvertMessage(IMessage message)
+        public static MessageDto ConvertMessage(Message message)
         {
             return new MessageDto
             {
@@ -75,11 +74,11 @@ namespace Sulimov.MyChat.Server.Helpers
         }
 
         /// <summary>
-        /// Convert <see cref="IChat"/> instance to instance of <see cref="ChatDto"/>.
+        /// Convert <see cref="Chat"/> instance to instance of <see cref="ChatDto"/>.
         /// </summary>
-        /// <param name="chat"><see cref="IChat"/> instance.</param>
+        /// <param name="chat"><see cref="Chat"/> instance.</param>
         /// <returns>Instance of <see cref="ChatDto"/>.</returns>
-        public static ChatDto ConvertChat(IChat chat)
+        public static ChatDto ConvertChat(Chat chat)
         {
             return new ChatDto
             {
@@ -105,33 +104,24 @@ namespace Sulimov.MyChat.Server.Helpers
                 return data;
             }
 
-            if (data is IUser userData)
+            switch (data)
             {
-                return ConvertUser(userData);
-            }
-            else if (data is IChat chatData)
-            {
-                return ConvertChat(chatData);
-            }
-            else if (data is IMessage messageData)
-            {
-                return ConvertMessage(messageData);
-            }
-            else if (data is IEnumerable<IMessage> messageDataCollection)
-            {
-                return messageDataCollection
-                    .Select(s => ConvertMessage(s))
-                    .ToArray();
-            }
-            else if (data is IEnumerable<IChat> chatDataCollection)
-            {
-                return chatDataCollection
+                case User user:
+                    return ConvertUser(user);
+                case Chat chat:
+                    return ConvertChat(chat);
+                case Message message:
+                    return ConvertMessage(message);
+                case IEnumerable<Chat> chats:
+                    return chats
                     .Select(s => ConvertChat(s))
                     .ToArray();
-            }
-            else
-            {
-                throw new ArgumentException("Unknown result type");
+                case IEnumerable<Message> messages:
+                    return messages
+                    .Select(s => ConvertMessage(s))
+                    .ToArray();
+                default:
+                    throw new ArgumentException("Unknown result type");
             }
         }
     }

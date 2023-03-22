@@ -12,7 +12,7 @@ using Sulimov.MyChat.Server.DAL;
 namespace Sulimov.MyChat.Server.DAL.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20230303115302_Init")]
+    [Migration("20230322150549_Init")]
     partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -53,15 +53,15 @@ namespace Sulimov.MyChat.Server.DAL.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "7f1d49b7-08cd-45da-8116-bb0655e28167",
-                            ConcurrencyStamp = "bde846a2-7e77-46c1-8152-fefdcb542468",
+                            Id = "912ec413-7a16-4344-b07b-8bb39590ad01",
+                            ConcurrencyStamp = "48733624-f771-4500-9a4d-b9c03fa2ac31",
                             Name = "Admin",
                             NormalizedName = "Admin"
                         },
                         new
                         {
-                            Id = "f1e04048-15f7-4d24-99e8-934d32ff05f5",
-                            ConcurrencyStamp = "dde4f73a-e8c9-42fe-9a8d-9d38244795e6",
+                            Id = "72105689-2de4-429d-8423-414ef9d5d238",
+                            ConcurrencyStamp = "5eedf3c4-345f-431c-9823-6e8d2fca73a0",
                             Name = "User",
                             NormalizedName = "User"
                         });
@@ -269,8 +269,8 @@ namespace Sulimov.MyChat.Server.DAL.Migrations
                     b.Property<int>("ChatId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset>("DateTime")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("SenderId")
                         .IsRequired()

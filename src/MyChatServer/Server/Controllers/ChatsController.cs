@@ -8,6 +8,7 @@ using Sulimov.MyChat.Server.Helpers;
 using Sulimov.MyChat.Server.Hubs;
 using Sulimov.MyChat.Server.Models;
 using Sulimov.MyChat.Server.Models.Responses;
+using System.Collections.Generic;
 
 namespace Sulimov.MyChat.Server.Controllers
 {
@@ -40,7 +41,7 @@ namespace Sulimov.MyChat.Server.Controllers
 
             var result = await chatService.GetUserChats(userId);
 
-            return ResultHelper.CreateHttpResultFromData<IEnumerable<ChatDto>>(this, result.Status, result.Message, result.Data);
+            return ResultHelper.CreateHttpResult<IEnumerable<Chat>, IEnumerable<ChatDto>>(this, result);
         }
 
         // api/chats
@@ -63,7 +64,7 @@ namespace Sulimov.MyChat.Server.Controllers
 
             await SendResult(result);
 
-            return ResultHelper.CreateHttpResultFromData<ChatDto>(this, result.Status, result.Message, result.Data);
+            return ResultHelper.CreateHttpResult<Chat, ChatDto>(this, result);
         }
 
         // api/chats/add-user
@@ -86,7 +87,7 @@ namespace Sulimov.MyChat.Server.Controllers
 
             await SendResult(result);
 
-            return ResultHelper.CreateHttpResultFromData<ChatDto>(this, result.Status, result.Message, result.Data);
+            return ResultHelper.CreateHttpResult<Chat, ChatDto>(this, result);
         }
 
         // api/chats/remove-user
@@ -112,7 +113,7 @@ namespace Sulimov.MyChat.Server.Controllers
                 await chatHubContext.Clients.Users(request.UserId).SendAsync("remove-user-from-chat", result.Data.Id);
             }
 
-            return ResultHelper.CreateHttpResultFromData<ChatDto>(this, result.Status, result.Message, result.Data);
+            return ResultHelper.CreateHttpResult<Chat, ChatDto>(this, result);
         }
 
         // api/chats/set-admin
@@ -135,7 +136,7 @@ namespace Sulimov.MyChat.Server.Controllers
 
             await SendResult(result);
 
-            return ResultHelper.CreateHttpResultFromData<ChatDto>(this, result.Status, result.Message, result.Data);
+            return ResultHelper.CreateHttpResult<Chat, ChatDto>(this, result);
         }
 
         // api/chats/remove-admin
@@ -158,10 +159,10 @@ namespace Sulimov.MyChat.Server.Controllers
 
             await SendResult(result);
 
-            return ResultHelper.CreateHttpResultFromData<ChatDto>(this, result.Status, result.Message, result.Data);
+            return ResultHelper.CreateHttpResult<Chat, ChatDto>(this, result);
         }
 
-        private async Task SendResult(IResult<IChat> result)
+        private async Task SendResult(Result<Chat> result)
         {
             if (result.IsSuccess)
             {

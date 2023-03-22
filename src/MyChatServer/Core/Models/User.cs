@@ -3,21 +3,21 @@
     /// <summary>
     /// User.
     /// </summary>
-    public interface IUser
+    public class User
     {
         /// <summary>
         /// User ID.
         /// </summary>
-        string Id { get; set; }
+        public string Id { get; set; } = string.Empty;
 
         /// <summary>
         /// User name (login).
         /// </summary>
-        string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// User e-mail.
         /// </summary>
-        string Email { get; set; }
+        public string Email { get; set; } = string.Empty;
     }
 }

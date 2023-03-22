@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Sulimov.MyChat.Server.BL.Models;
 using Sulimov.MyChat.Server.Core.Enums;
 using Sulimov.MyChat.Server.Core.Models;
 using Sulimov.MyChat.Server.Core.Services;
@@ -19,7 +18,7 @@ namespace Sulimov.MyChat.Server.BL.Services
         }
 
         /// <inheritdoc/>
-        public async Task<IResult<IEnumerable<IMessage>>> GetAllChatMessages(int chatId, string currentUserId)
+        public async Task<Result<IEnumerable<Message>>> GetAllChatMessages(int chatId, string currentUserId)
         {
             var result = await CheckChatExistsAndCurrentUserHasPermissions(chatId, currentUserId);
             if (!result.IsSuccess)
@@ -29,14 +28,14 @@ namespace Sulimov.MyChat.Server.BL.Services
 
             var messages = await dbContext.Messages
                 .Where(w => w.ChatId == chatId)
-                .Select(s => new Message(s))
+                .Select(s => CreateMessage(s))
                 .ToArrayAsync();
             
-            return new Result<IEnumerable<IMessage>>(ResultStatus.Success, messages);
+            return new Result<IEnumerable<Message>>(ResultStatus.Success, messages);
         }
 
         /// <inheritdoc/>
-        public async Task<IResult<IEnumerable<IMessage>>> GetLastChatMessages(int chatId, string currentUserId, DateTime fromDateTime)
+        public async Task<Result<IEnumerable<Message>>> GetLastChatMessages(int chatId, string currentUserId, DateTimeOffset fromDateTime)
         {
             var result = await CheckChatExistsAndCurrentUserHasPermissions(chatId, currentUserId);
             if (!result.IsSuccess)
@@ -45,15 +44,15 @@ namespace Sulimov.MyChat.Server.BL.Services
             }
 
             var messages = await dbContext.Messages
-                .Where(w => w.ChatId == chatId && w.Date >= fromDateTime.ToUniversalTime())
-                .Select(s => new Message(s))
+                .Where(w => w.ChatId == chatId && w.DateTime >= fromDateTime)
+                .Select(s => CreateMessage(s))
                 .ToArrayAsync();
 
-            return new Result<IEnumerable<IMessage>>(ResultStatus.Success, messages);
+            return new Result<IEnumerable<Message>>(ResultStatus.Success, messages);
         }
 
         /// <inheritdoc/>
-        public async Task<IResult<IMessage>> SaveMessage(string senderId, int chatId, string message)
+        public async Task<Result<Message>> SaveMessage(string senderId, int chatId, string message)
         {
             var chat = await dbContext.Chats
                 .Include(i => i.Users)
@@ -62,35 +61,35 @@ namespace Sulimov.MyChat.Server.BL.Services
 
             if (chat == null)
             {
-                return new Result<IMessage>(ResultStatus.ObjectNotFound, Message.Instance, "Chat not found.");
+                return new Result<Message>(ResultStatus.ObjectNotFound, new Message(), "Chat not found.");
             }
 
             var sender = await dbContext.Users.FirstOrDefaultAsync(f => f.Id == senderId);
             if (sender == null)
             {
-                return new Result<IMessage>(ResultStatus.ObjectNotFound, Message.Instance, $"Sender {senderId} not found.");
+                return new Result<Message>(ResultStatus.ObjectNotFound, new Message(), $"Sender {senderId} not found.");
             }
 
             if (!chat.Users.Any(a => a.User.Id == senderId))
             {
-                return new Result<IMessage>(ResultStatus.ObjectNotFound, Message.Instance, $"Sender {senderId} isn't included to chat {chatId}.");
+                return new Result<Message>(ResultStatus.ObjectNotFound, new Message(), $"Sender {senderId} isn't included to chat {chatId}.");
             }
             
             var dbModel = new DbMessage
             {
                 Sender = sender,
                 Chat = chat,
-                Date = DateTime.UtcNow,
+                DateTime = DateTimeOffset.UtcNow,
                 Text = message,
             };
 
             dbContext.Messages.Add(dbModel);
             await dbContext.SaveChangesAsync();
 
-            return new Result<IMessage>(ResultStatus.Success, new Message(dbModel));
+            return new Result<Message>(ResultStatus.Success, CreateMessage(dbModel));
         }
 
-        private async Task<IResult<IEnumerable<IMessage>>> CheckChatExistsAndCurrentUserHasPermissions(int chatId, string currentUserId)
+        private async Task<Result<IEnumerable<Message>>> CheckChatExistsAndCurrentUserHasPermissions(int chatId, string currentUserId)
         {
             var chat = await dbContext.Chats
                 .Include(i => i.Users)
@@ -99,15 +98,32 @@ namespace Sulimov.MyChat.Server.BL.Services
 
             if (chat == null)
             {
-                return new Result<IEnumerable<IMessage>>(ResultStatus.ObjectNotFound, new List<Message>(), $"Chat {chatId} not found.");
+                return new Result<IEnumerable<Message>>(ResultStatus.ObjectNotFound, Array.Empty<Message>(), $"Chat {chatId} not found.");
             }
 
             if (!chat.Users.Any(a => a.User.Id == currentUserId))
             {
-                return new Result<IEnumerable<IMessage>>(ResultStatus.AccessDenied, new List<Message>(), $"User {currentUserId} doesn't have access to chat {chatId}");
+                return new Result<IEnumerable<Message>>(ResultStatus.AccessDenied, Array.Empty<Message>(), $"User {currentUserId} doesn't have access to chat {chatId}");
             }
 
-            return new Result<IEnumerable<IMessage>>(ResultStatus.Success, new List<Message>());
+            return new Result<IEnumerable<Message>>(ResultStatus.Success, Array.Empty<Message>());
+        }
+
+        private static Message CreateMessage(DbMessage dbMessage)
+        {
+            return new Message
+            {
+                Id = dbMessage.Id,
+                ChatId = dbMessage.ChatId,
+                DateTime = dbMessage.DateTime,
+                Text = dbMessage.Text,
+                Sender = new User
+                {
+                    Id = dbMessage.Sender.Id,
+                    Name = dbMessage.Sender.UserName,
+                    Email = dbMessage.Sender.Email,
+                }
+            };
         }
     }
 }

@@ -10,7 +10,7 @@
         /// <summary>
         /// Message date and time.
         /// </summary>
-        public DateTime Date { get; set; }
+        public DateTimeOffset DateTime { get; set; }
 
         /// <summary>
         /// Sender.

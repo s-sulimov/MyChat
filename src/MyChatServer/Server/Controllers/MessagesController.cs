@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Sulimov.MyChat.Server.Core;
+using Sulimov.MyChat.Server.Core.Models;
 using Sulimov.MyChat.Server.Core.Services;
 using Sulimov.MyChat.Server.Helpers;
 using Sulimov.MyChat.Server.Hubs;
@@ -45,7 +46,7 @@ namespace Sulimov.MyChat.Server.Controllers
 
             var result = await messageService.GetAllChatMessages(chatId, userId);
 
-            return ResultHelper.CreateHttpResultFromData<IEnumerable<MessageDto>>(this, result.Status, result.Message, result.Data);
+            return ResultHelper.CreateHttpResult<IEnumerable<Message>, IEnumerable<MessageDto>>(this, result);
         }
 
         // api/messages/last
@@ -59,9 +60,9 @@ namespace Sulimov.MyChat.Server.Controllers
                 return StatusCode(500, Constants.UnknownErrorMessage);
             }
 
-            var result = await messageService.GetLastChatMessages(chatId, userId, fromDateTime);
+            var result = await messageService.GetLastChatMessages(chatId, userId, new DateTimeOffset(fromDateTime.ToUniversalTime()));
 
-            return ResultHelper.CreateHttpResultFromData<IEnumerable<MessageDto>>(this, result.Status, result.Message, result.Data);
+            return ResultHelper.CreateHttpResult<IEnumerable<Message>, IEnumerable<MessageDto>>(this, result);
         }
 
         // api/messages
@@ -88,7 +89,7 @@ namespace Sulimov.MyChat.Server.Controllers
                 await chatHubContext.Clients.Users(users).SendAsync("message", ResultHelper.ConvertMessage(result.Data));
             }
 
-            return ResultHelper.CreateHttpResultFromData<MessageDto>(this, result.Status, result.Message, result.Data);
+            return ResultHelper.CreateHttpResult<Message, MessageDto>(this, result);
         }
     }
 }

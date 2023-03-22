@@ -12,7 +12,7 @@ namespace Sulimov.MyChat.Server.Core.Services
         /// </summary>
         /// <param name="userName">Login or email.</param>
         /// <returns>Result that contains user info.</returns>
-        Task<IResult<IUser>> GetUser(string userName);
+        Task<Result<User>> GetUser(string userName);
 
         /// <summary>
         /// Create new user.
@@ -21,7 +21,7 @@ namespace Sulimov.MyChat.Server.Core.Services
         /// <param name="email">Email.</param>
         /// <param name="password">Password.</param>
         /// <returns>Result that contains new user info.</returns>
-        Task<IResult<IUser>> CreateUser(string userName, string email, string password);
+        Task<Result<User>> CreateUser(string userName, string email, string password);
 
         /// <summary>
         /// Change user's email.
@@ -30,7 +30,7 @@ namespace Sulimov.MyChat.Server.Core.Services
         /// <param name="password">User password.</param>
         /// <param name="email">New e-mail.</param>
         /// <returns>Result that contains user info.</returns>
-        Task<IResult<IUser>> ChangeEmail(string userId, string password, string email);
+        Task<Result<User>> ChangeEmail(string userId, string password, string email);
 
         /// <summary>
         /// Change user's password.
@@ -39,6 +39,6 @@ namespace Sulimov.MyChat.Server.Core.Services
         /// <param name="currentPassword">Current password.</param>
         /// <param name="newPassword">New password.</param>
         /// <returns>Result that contains user info.</returns>
-        Task<IResult<IUser>> ChangePassword(string userId, string currentPassword, string newPassword);
+        Task<Result<User>> ChangePassword(string userId, string currentPassword, string newPassword);
     }
 }

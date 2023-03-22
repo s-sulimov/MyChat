@@ -1,5 +1,4 @@
 using Serilog;
-using Serilog.Formatting.Compact;
 using System.Globalization;
 
 namespace Sulimov.MyChat.Server

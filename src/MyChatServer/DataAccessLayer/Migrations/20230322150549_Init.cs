@@ -224,7 +224,7 @@ namespace Sulimov.MyChat.Server.DAL.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DateTime = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     SenderId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ChatId = table.Column<int>(type: "int", nullable: false),
                     Text = table.Column<string>(type: "nvarchar(max)", nullable: false)
@@ -251,8 +251,8 @@ namespace Sulimov.MyChat.Server.DAL.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "7f1d49b7-08cd-45da-8116-bb0655e28167", "bde846a2-7e77-46c1-8152-fefdcb542468", "Admin", "Admin" },
-                    { "f1e04048-15f7-4d24-99e8-934d32ff05f5", "dde4f73a-e8c9-42fe-9a8d-9d38244795e6", "User", "User" }
+                    { "72105689-2de4-429d-8423-414ef9d5d238", "5eedf3c4-345f-431c-9823-6e8d2fca73a0", "User", "User" },
+                    { "912ec413-7a16-4344-b07b-8bb39590ad01", "48733624-f771-4500-9a4d-b9c03fa2ac31", "Admin", "Admin" }
                 });
 
             migrationBuilder.InsertData(

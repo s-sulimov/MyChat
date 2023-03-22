@@ -60,8 +60,8 @@ namespace Sulimov.MyChat.Server.BL.FunctionalTests
             await ResetDataBase();
 
             // Act.
-            var result1 = await messageService.GetLastChatMessages(chatId, currentUserId, DateTime.Now.AddHours(1).ToUniversalTime());
-            var result2 = await messageService.GetLastChatMessages(chatId, currentUserId, DateTime.MinValue.ToUniversalTime());
+            var result1 = await messageService.GetLastChatMessages(chatId, currentUserId, DateTimeOffset.UtcNow.AddHours(1));
+            var result2 = await messageService.GetLastChatMessages(chatId, currentUserId, DateTimeOffset.MinValue);
 
             // Assert.
             Assert.AreEqual(0, result1.Data.Count());
@@ -175,7 +175,7 @@ namespace Sulimov.MyChat.Server.BL.FunctionalTests
                 context.Messages.Add(new DbMessage
                 {
                     Chat = newChat,
-                    Date = DateTime.MinValue.ToUniversalTime(),
+                    DateTime = DateTimeOffset.MinValue,
                     SenderId = "1",
                     Text = "Hey",
                 });
@@ -183,7 +183,7 @@ namespace Sulimov.MyChat.Server.BL.FunctionalTests
                 context.Messages.Add(new DbMessage
                 {
                     Chat = newChat,
-                    Date = DateTime.Now.ToUniversalTime(),
+                    DateTime = DateTimeOffset.UtcNow,
                     SenderId = "2",
                     Text = "Hey guys",
                 });
