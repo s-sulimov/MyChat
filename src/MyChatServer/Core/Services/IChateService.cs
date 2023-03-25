@@ -12,7 +12,7 @@ namespace Sulimov.MyChat.Server.Core.Services
         /// </summary>
         /// <param name="userId">User ID.</param>
         /// <returns>Result that contains the list of available chats.</returns>
-        Task<Result<IEnumerable<Chat>>> GetUserChats(string userId);
+        Task<Result<IReadOnlyCollection<Chat>>> GetUserChats(string userId);
 
         /// <summary>
         /// Create new chat.
@@ -21,7 +21,7 @@ namespace Sulimov.MyChat.Server.Core.Services
         /// <param name="title">Chat users IDs.</param>
         /// <param name="ownerId">Chat owner ID.</param>
         /// <returns>Result that contains new chat..</returns>
-        Task<Result<Chat>> CreateChat(string title, IEnumerable<string> userIds, string ownerId);
+        Task<Result<Chat>> CreateChat(string title, IReadOnlyCollection<string> userIds, string ownerId);
 
         /// <summary>
         /// Add user to chat.
@@ -64,6 +64,6 @@ namespace Sulimov.MyChat.Server.Core.Services
         /// </summary>
         /// <param name="chatId">Chat ID.</param>
         /// <returns>All chat's users.</returns>
-        Task<IEnumerable<string>> GetChatUsers(int chatId);
+        Task<IReadOnlyCollection<string>> GetChatUsers(int chatId);
     }
 }

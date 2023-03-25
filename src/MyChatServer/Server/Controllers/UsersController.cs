@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Sulimov.MyChat.Server.Core;
 using Sulimov.MyChat.Server.Core.Models;
 using Sulimov.MyChat.Server.Core.Services;
 using Sulimov.MyChat.Server.Helpers;
@@ -82,11 +81,6 @@ namespace Sulimov.MyChat.Server.Controllers
             }
 
             var userId = ControllerHelper.GetCurrentUserId(httpContextAccessor);
-            if (string.IsNullOrEmpty(userId))
-            {
-                return StatusCode(500, Constants.UnknownErrorMessage);
-            }
-
             var result = await userService.ChangeEmail(userId, request.Password, request.Email);
 
             return ResultHelper.CreateHttpResult<User, UserDto>(this, result);
@@ -103,11 +97,6 @@ namespace Sulimov.MyChat.Server.Controllers
             }
 
             var userId = ControllerHelper.GetCurrentUserId(httpContextAccessor);
-            if (string.IsNullOrEmpty(userId))
-            {
-                return StatusCode(500, Constants.UnknownErrorMessage);
-            }
-
             var result = await userService.ChangePassword(userId, request.CurrentPassword, request.NewPassword);
 
             return ResultHelper.CreateHttpResult<User, UserDto>(this, result);

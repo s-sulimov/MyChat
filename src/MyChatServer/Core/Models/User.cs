@@ -8,16 +8,23 @@
         /// <summary>
         /// User ID.
         /// </summary>
-        public string Id { get; set; } = string.Empty;
+        public string Id { get; }
 
         /// <summary>
         /// User name (login).
         /// </summary>
-        public string Name { get; set; } = string.Empty;
+        public string Name { get; }
 
         /// <summary>
         /// User e-mail.
         /// </summary>
-        public string Email { get; set; } = string.Empty;
+        public string Email { get; }
+
+        public User(string id, string name, string email)
+        {
+            Id = id;
+            Name = name;
+            Email = email;
+        }
     }
 }

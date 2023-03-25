@@ -47,7 +47,7 @@ namespace Sulimov.MyChat.Server.BL.FunctionalTests
             var result = await messageService.GetAllChatMessages(chatId, currentUserId);
 
             // Assert.
-            Assert.AreEqual(messageCountExpected, result.Data.Count());
+            Assert.AreEqual(messageCountExpected, result.Data?.Count ?? 0);
         }
 
         [TestMethod]
@@ -64,8 +64,8 @@ namespace Sulimov.MyChat.Server.BL.FunctionalTests
             var result2 = await messageService.GetLastChatMessages(chatId, currentUserId, DateTimeOffset.MinValue);
 
             // Assert.
-            Assert.AreEqual(0, result1.Data.Count());
-            Assert.AreEqual(messageCountExpected, result2.Data.Count());
+            Assert.AreEqual(0, result1.Data?.Count ?? 0);
+            Assert.AreEqual(messageCountExpected, result2.Data?.Count ?? 0);
         }
 
         [TestMethod]

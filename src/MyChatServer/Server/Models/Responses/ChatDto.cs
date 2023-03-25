@@ -8,16 +8,23 @@
         /// <summary>
         /// Chat ID.
         /// </summary>
-        public int Id { get; set; }
+        public int Id { get; }
 
         /// <summary>
         /// Chat title.
         /// </summary>
-        public string Title { get; set; } = string.Empty;
+        public string Title { get; }
 
         /// <summary>
         /// Chat users.
         /// </summary>
-        public IEnumerable<ChatUserDto> Users { get; set; } = Array.Empty<ChatUserDto>();
+        public IReadOnlyCollection<ChatUserDto> Users { get; }
+
+        public ChatDto(int id, string title, IReadOnlyCollection<ChatUserDto> users)
+        {
+            Id = id;
+            Title = title;
+            Users = users;
+        }
     }
 }

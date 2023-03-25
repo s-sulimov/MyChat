@@ -22,7 +22,7 @@ namespace Sulimov.MyChat.Server.Core.Services
         /// <param name="chatId">Chat ID.</param>
         /// <param name="currentUserId">Current user ID ID.</param>
         /// <returns>Result that contains list of messages.</returns>
-        public Task<Result<IEnumerable<Message>>> GetAllChatMessages(int chatId, string currentUserId);
+        public Task<Result<IReadOnlyCollection<Message>>> GetAllChatMessages(int chatId, string currentUserId);
 
         /// <summary>
         /// Get last message from chat.
@@ -31,6 +31,6 @@ namespace Sulimov.MyChat.Server.Core.Services
         /// <param name="currentUserId">Current user ID ID.</param>
         /// <param name="fromDateTime">Current user ID ID.</param>
         /// <returns>Result that contains list of messages.</returns>
-        public Task<Result<IEnumerable<Message>>> GetLastChatMessages(int chatId, string currentUserId, DateTimeOffset fromDateTime);
+        public Task<Result<IReadOnlyCollection<Message>>> GetLastChatMessages(int chatId, string currentUserId, DateTimeOffset fromDateTime);
     }
 }

@@ -15,6 +15,6 @@ namespace Sulimov.MyChat.Server.Services
         /// <param name="user">User.</param>
         /// <param name="roleClaims">Claims for user roles.</param>
         /// <returns>Response that contains JWT token.</returns>
-        AuthenticationResponse CreateToken(DbUser user, IEnumerable<Claim> roleClaims);
+        AuthenticationResponse CreateToken(DbUser user, IReadOnlyCollection<Claim> roleClaims);
     }
 }

@@ -27,19 +27,19 @@ namespace Sulimov.MyChat.Server.Services
             DbUser user = await userManager.FindByNameAsync(userName) ?? await userManager.FindByEmailAsync(userName);
             if (user == null)
             {
-                return new Result<AuthenticationResponse>(ResultStatus.ObjectNotFound, AuthenticationResponse.Instance, $"User {userName} not found.");
+                return new Result<AuthenticationResponse>(ResultStatus.ObjectNotFound, $"User {userName} not found.");
             }
 
             var result = await signInManager.CheckPasswordSignInAsync(user, password, false);
             if (!result.Succeeded)
             {
-                return new Result<AuthenticationResponse>(ResultStatus.InconsistentData, AuthenticationResponse.Instance, "Bad credentials");
+                return new Result<AuthenticationResponse>(ResultStatus.InconsistentData, "Bad credentials");
             }
 
             var userRoles = await userManager.GetRolesAsync(user);
-            var token = jwtService.CreateToken(user, userRoles.Select(s => new Claim(ClaimTypes.Role, s)));
+            var token = jwtService.CreateToken(user, userRoles.Select(s => new Claim(ClaimTypes.Role, s)).ToList());
 
-            return new Result<AuthenticationResponse>(ResultStatus.Success, token, string.Empty);
+            return new Result<AuthenticationResponse>(ResultStatus.Success, token);
         }
     }
 }

@@ -46,14 +46,11 @@ namespace Sulimov.MyChat.Server.Helpers
         /// </summary>
         /// <param name="user"><see cref="User"/> instance.</param>
         /// <returns>Instance of <see cref="UserDto"/>.</returns>
-        public static UserDto ConvertUser(User user)
+        public static UserDto ConvertUser(User? user)
         {
-            return new UserDto
-            {
-                Id = user.Id,
-                Name = user.Name,
-                Email = user.Email,
-            };
+            ArgumentNullException.ThrowIfNull(user, nameof(user));
+
+            return new UserDto(id: user.Id, name: user.Name, email: user.Email);
         }
 
         /// <summary>
@@ -61,16 +58,16 @@ namespace Sulimov.MyChat.Server.Helpers
         /// </summary>
         /// <param name="message"><see cref="Message"/> instance.</param>
         /// <returns>Instance of <see cref="MessageDto"/>.</returns>
-        public static MessageDto ConvertMessage(Message message)
+        public static MessageDto ConvertMessage(Message? message)
         {
-            return new MessageDto
-            {
-                Id = message.Id,
-                ChatId = message.ChatId,
-                DateTime = message.DateTime,
-                Sender = ConvertUser(message.Sender),
-                Text = message.Text,
-            };
+            ArgumentNullException.ThrowIfNull(message, nameof(message));
+
+            return new MessageDto(
+                id: message.Id,
+                chatId: message.ChatId,
+                dateTime: message.DateTime,
+                sender: ConvertUser(message.Sender),
+                text: message.Text);
         }
 
         /// <summary>
@@ -78,26 +75,22 @@ namespace Sulimov.MyChat.Server.Helpers
         /// </summary>
         /// <param name="chat"><see cref="Chat"/> instance.</param>
         /// <returns>Instance of <see cref="ChatDto"/>.</returns>
-        public static ChatDto ConvertChat(Chat chat)
+        public static ChatDto ConvertChat(Chat? chat)
         {
-            return new ChatDto
-            {
-                Id = chat.Id,
-                Title = chat.Title,
-                Users = chat.Users.Select(s => new ChatUserDto
-                {
-                    Id = s.Id,
-                    User = ConvertUser(s.User),
-                    Role = new ChatRoleDto
-                    {
-                        Id = s.Role.Id,
-                        Name = s.Role.Name,
-                    },
-                }),
-            };
+            ArgumentNullException.ThrowIfNull(chat, nameof(chat));
+
+            return new ChatDto(
+                id: chat.Id,
+                title: chat.Title,
+                users: chat.Users
+                    .Select(s => new ChatUserDto(
+                        id: s.Id,
+                        user: ConvertUser(s.User),
+                        role: new ChatRoleDto(s.Role.Id, s.Role.Name)))
+                    .ToList());
         }
 
-        private static object ConvertData<T>(object data)
+        private static object ConvertData<T>(object? data)
         {
             if (data is T)
             {
@@ -112,14 +105,14 @@ namespace Sulimov.MyChat.Server.Helpers
                     return ConvertChat(chat);
                 case Message message:
                     return ConvertMessage(message);
-                case IEnumerable<Chat> chats:
+                case IReadOnlyCollection<Chat> chats:
                     return chats
                     .Select(s => ConvertChat(s))
-                    .ToArray();
-                case IEnumerable<Message> messages:
+                    .ToList();
+                case IReadOnlyCollection<Message> messages:
                     return messages
                     .Select(s => ConvertMessage(s))
-                    .ToArray();
+                    .ToList();
                 default:
                     throw new ArgumentException("Unknown result type");
             }

@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using Sulimov.MyChat.Server.Core;
 using Sulimov.MyChat.Server.Core.Models;
 using Sulimov.MyChat.Server.Core.Services;
 using Sulimov.MyChat.Server.Helpers;
@@ -36,33 +35,23 @@ namespace Sulimov.MyChat.Server.Controllers
         // api/messages/all
         [HttpGet("all")]
         [Produces("application/json")]
-        public async Task<ActionResult<IEnumerable<MessageDto>>> GetAllMessages(int chatId)
+        public async Task<ActionResult<IReadOnlyCollection<MessageDto>>> GetAllMessages(int chatId)
         {
             var userId = ControllerHelper.GetCurrentUserId(httpContextAccessor);
-            if (string.IsNullOrEmpty(userId))
-            {
-                return StatusCode(500, Constants.UnknownErrorMessage);
-            }
-
             var result = await messageService.GetAllChatMessages(chatId, userId);
 
-            return ResultHelper.CreateHttpResult<IEnumerable<Message>, IEnumerable<MessageDto>>(this, result);
+            return ResultHelper.CreateHttpResult<IReadOnlyCollection<Message>, IReadOnlyCollection<MessageDto>>(this, result);
         }
 
         // api/messages/last
         [HttpGet("last")]
         [Produces("application/json")]
-        public async Task<ActionResult<IEnumerable<MessageDto>>> GetLastMessages(int chatId, DateTime fromDateTime)
+        public async Task<ActionResult<IReadOnlyCollection<MessageDto>>> GetLastMessages(int chatId, DateTime fromDateTime)
         {
             var userId = ControllerHelper.GetCurrentUserId(httpContextAccessor);
-            if (string.IsNullOrEmpty(userId))
-            {
-                return StatusCode(500, Constants.UnknownErrorMessage);
-            }
-
             var result = await messageService.GetLastChatMessages(chatId, userId, new DateTimeOffset(fromDateTime.ToUniversalTime()));
 
-            return ResultHelper.CreateHttpResult<IEnumerable<Message>, IEnumerable<MessageDto>>(this, result);
+            return ResultHelper.CreateHttpResult<IReadOnlyCollection<Message>, IReadOnlyCollection<MessageDto>>(this, result);
         }
 
         // api/messages
@@ -76,11 +65,6 @@ namespace Sulimov.MyChat.Server.Controllers
             }
 
             var userId = ControllerHelper.GetCurrentUserId(httpContextAccessor);
-            if (userId == null)
-            {
-                return StatusCode(500, Constants.UnknownErrorMessage);
-            }
-
             var result = await messageService.SaveMessage(userId, message.ChatId, message.Message);
 
             if (result.IsSuccess)

@@ -1,14 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using Sulimov.MyChat.Server.Core;
 using Sulimov.MyChat.Server.Core.Models;
 using Sulimov.MyChat.Server.Core.Services;
 using Sulimov.MyChat.Server.Helpers;
 using Sulimov.MyChat.Server.Hubs;
 using Sulimov.MyChat.Server.Models;
 using Sulimov.MyChat.Server.Models.Responses;
-using System.Collections.Generic;
 
 namespace Sulimov.MyChat.Server.Controllers
 {
@@ -31,17 +29,12 @@ namespace Sulimov.MyChat.Server.Controllers
         // api/chats
         [HttpGet]
         [Produces("application/json")]
-        public async Task<ActionResult<IEnumerable<ChatDto>>> GetChats()
+        public async Task<ActionResult<IReadOnlyCollection<ChatDto>>> GetChats()
         {
             var userId = ControllerHelper.GetCurrentUserId(httpContextAccessor);
-            if (string.IsNullOrEmpty(userId))
-            {
-                return StatusCode(500, Constants.UnknownErrorMessage);
-            }
-
             var result = await chatService.GetUserChats(userId);
 
-            return ResultHelper.CreateHttpResult<IEnumerable<Chat>, IEnumerable<ChatDto>>(this, result);
+            return ResultHelper.CreateHttpResult<IReadOnlyCollection<Chat>, IReadOnlyCollection<ChatDto>>(this, result);
         }
 
         // api/chats
@@ -55,12 +48,7 @@ namespace Sulimov.MyChat.Server.Controllers
             }
 
             var currentUserId = ControllerHelper.GetCurrentUserId(httpContextAccessor);
-            if (string.IsNullOrEmpty(currentUserId))
-            {
-                return StatusCode(500, Constants.UnknownErrorMessage);
-            }
-
-            var result = await this.chatService.CreateChat(request.Title, request.ChatUserIds, currentUserId);
+            var result = await chatService.CreateChat(request.Title, (IReadOnlyCollection<string>)request.ChatUserIds, currentUserId);
 
             await SendResult(result);
 
@@ -78,12 +66,7 @@ namespace Sulimov.MyChat.Server.Controllers
             }
 
             var currentUserId = ControllerHelper.GetCurrentUserId(httpContextAccessor);
-            if (string.IsNullOrEmpty(currentUserId))
-            {
-                return StatusCode(500, Constants.UnknownErrorMessage);
-            }
-
-            var result = await this.chatService.AddUserToChat(request.ChatId, currentUserId, request.UserId);
+            var result = await chatService.AddUserToChat(request.ChatId, currentUserId, request.UserId);
 
             await SendResult(result);
 
@@ -101,16 +84,11 @@ namespace Sulimov.MyChat.Server.Controllers
             }
 
             var currentUserId = ControllerHelper.GetCurrentUserId(httpContextAccessor);
-            if (string.IsNullOrEmpty(currentUserId))
-            {
-                return StatusCode(500, Constants.UnknownErrorMessage);
-            }
-
-            var result = await this.chatService.RemoveUserFromChat(request.ChatId, currentUserId, request.UserId);
+            var result = await chatService.RemoveUserFromChat(request.ChatId, currentUserId, request.UserId);
 
             if (result.IsSuccess)
             {
-                await chatHubContext.Clients.Users(request.UserId).SendAsync("remove-user-from-chat", result.Data.Id);
+                await chatHubContext.Clients.Users(request.UserId).SendAsync("remove-user-from-chat", result.Data?.Id);
             }
 
             return ResultHelper.CreateHttpResult<Chat, ChatDto>(this, result);
@@ -127,12 +105,7 @@ namespace Sulimov.MyChat.Server.Controllers
             }
 
             var currentUserId = ControllerHelper.GetCurrentUserId(httpContextAccessor);
-            if (string.IsNullOrEmpty(currentUserId))
-            {
-                return StatusCode(500, Constants.UnknownErrorMessage);
-            }
-
-            var result = await this.chatService.SetChatAdmin(request.ChatId, currentUserId, request.UserId);
+            var result = await chatService.SetChatAdmin(request.ChatId, currentUserId, request.UserId);
 
             await SendResult(result);
 
@@ -150,12 +123,7 @@ namespace Sulimov.MyChat.Server.Controllers
             }
 
             var currentUserId = ControllerHelper.GetCurrentUserId(httpContextAccessor);
-            if (string.IsNullOrEmpty(currentUserId))
-            {
-                return StatusCode(500, Constants.UnknownErrorMessage);
-            }
-
-            var result = await this.chatService.RemoveChatAdmin(request.ChatId, currentUserId, request.UserId);
+            var result = await chatService.RemoveChatAdmin(request.ChatId, currentUserId, request.UserId);
 
             await SendResult(result);
 
@@ -166,9 +134,10 @@ namespace Sulimov.MyChat.Server.Controllers
         {
             if (result.IsSuccess)
             {
-                var users = result.Data.Users
+                var users = result.Data?.Users
                     .Select(s => s.User.Id)
-                    .ToArray();
+                    .ToList()
+                    ?? new List<string>();
 
                 await chatHubContext.Clients.Users(users).SendAsync("chat", ResultHelper.ConvertChat(result.Data));
             }

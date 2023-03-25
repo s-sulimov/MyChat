@@ -25,28 +25,28 @@ namespace Sulimov.MyChat.Server.BL.Services
             var user = await userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                return new Result<User>(ResultStatus.ObjectNotFound, new User(), $"User {userId} not found.");
+                return new Result<User>(ResultStatus.ObjectNotFound, $"User {userId} not found.");
             }
 
             var checkPasswordResult = await signInManager.CheckPasswordSignInAsync(user, password, false);
             if (!checkPasswordResult.Succeeded)
             {
-                return new Result<User>(ResultStatus.InconsistentData, new User(), "Bad credentials");
+                return new Result<User>(ResultStatus.InconsistentData, "Bad credentials");
             }
 
             var token = await userManager.GenerateChangeEmailTokenAsync(user, email);
             if (token == null)
             {
-                return new Result<User>(ResultStatus.InconsistentData, new User(), "Bad email");
+                return new Result<User>(ResultStatus.InconsistentData, "Bad email");
             }
 
             var result = await userManager.ChangeEmailAsync(user, email, token);
             if (!result.Succeeded)
             {
-                return new Result<User>(ResultStatus.InconsistentData, new User(), Constants.UnknownErrorMessage);
+                return new Result<User>(ResultStatus.InconsistentData, Constants.UnknownErrorMessage);
             }
 
-            return new Result<User>(ResultStatus.Success, CreateUser(user), string.Empty);
+            return new Result<User>(ResultStatus.Success, CreateUser(user));
         }
 
         /// <inheritdoc/>
@@ -55,16 +55,16 @@ namespace Sulimov.MyChat.Server.BL.Services
             var user = await userManager.FindByIdAsync(userId);
             if (user == null)
             {
-                return new Result<User>(ResultStatus.ObjectNotFound, new User(), $"User {userId} not found.");
+                return new Result<User>(ResultStatus.ObjectNotFound, $"User {userId} not found.");
             }
 
             var result = await userManager.ChangePasswordAsync(user, currentPassword, newPassword);
             if (!result.Succeeded)
             {
-                return new Result<User>(ResultStatus.InconsistentData, new User(), Constants.UnknownErrorMessage);
+                return new Result<User>(ResultStatus.InconsistentData, Constants.UnknownErrorMessage);
             }
 
-            return new Result<User>(ResultStatus.Success, CreateUser(user), string.Empty);
+            return new Result<User>(ResultStatus.Success, CreateUser(user));
         }
 
         /// <inheritdoc/>
@@ -81,17 +81,17 @@ namespace Sulimov.MyChat.Server.BL.Services
 
             if (!result.Succeeded)
             {
-                return new Result<User>(ResultStatus.InconsistentData, new User(), "User with this credentials has already exists");
+                return new Result<User>(ResultStatus.InconsistentData, "User with this credentials has already exists");
             }
 
             var dbUser = await userManager.FindByNameAsync(userName);
             var addRoleResult = await userManager.AddToRoleAsync(dbUser, Constants.IdentityUserRoleName);
             if (!addRoleResult.Succeeded)
             {
-                return new Result<User>(ResultStatus.InconsistentData,new User(), Constants.UnknownErrorMessage);
+                return new Result<User>(ResultStatus.InconsistentData, Constants.UnknownErrorMessage);
             }
 
-            return new Result<User>(ResultStatus.Success, CreateUser(dbUser), string.Empty);
+            return new Result<User>(ResultStatus.Success, CreateUser(dbUser));
         }
 
         /// <inheritdoc/>
@@ -100,20 +100,15 @@ namespace Sulimov.MyChat.Server.BL.Services
             DbUser dbUser = await userManager.FindByNameAsync(userName) ?? await userManager.FindByEmailAsync(userName);
             if (dbUser == null)
             {
-                return new Result<User>(ResultStatus.ObjectNotFound, new User(), $"User with login or email {userName} not found.");
+                return new Result<User>(ResultStatus.ObjectNotFound, $"User with login or email {userName} not found.");
             }
 
-            return new Result<User>(ResultStatus.Success, CreateUser(dbUser), string.Empty);
+            return new Result<User>(ResultStatus.Success, CreateUser(dbUser));
         }
 
         private static User CreateUser(DbUser dbUser)
         {
-            return new User
-            {
-                Id = dbUser.Id,
-                Name = dbUser.UserName,
-                Email = dbUser.Email,
-            };
+            return new User(id: dbUser.Id, name: dbUser.UserName, email: dbUser.Email);
         }
     }
 }

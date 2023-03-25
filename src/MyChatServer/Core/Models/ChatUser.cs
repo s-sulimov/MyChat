@@ -8,16 +8,23 @@
         /// <summary>
         /// Identifier.
         /// </summary>
-        public int Id { get; set; }
+        public int Id { get; }
 
         /// <summary>
         /// Chat user.
         /// </summary>
-        public User User { get; set; } = new User();
+        public User User { get; }
 
         /// <summary>
         /// User role.
         /// </summary>
-        public ChatRole Role { get; set; } = new ChatRole();
+        public ChatRole Role { get; }
+
+        public ChatUser(int id, User user, ChatRole role)
+        {
+            Id = id;
+            User = user;
+            Role = role;
+        }
     }
 }

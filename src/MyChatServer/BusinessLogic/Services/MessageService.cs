@@ -18,7 +18,7 @@ namespace Sulimov.MyChat.Server.BL.Services
         }
 
         /// <inheritdoc/>
-        public async Task<Result<IEnumerable<Message>>> GetAllChatMessages(int chatId, string currentUserId)
+        public async Task<Result<IReadOnlyCollection<Message>>> GetAllChatMessages(int chatId, string currentUserId)
         {
             var result = await CheckChatExistsAndCurrentUserHasPermissions(chatId, currentUserId);
             if (!result.IsSuccess)
@@ -29,13 +29,13 @@ namespace Sulimov.MyChat.Server.BL.Services
             var messages = await dbContext.Messages
                 .Where(w => w.ChatId == chatId)
                 .Select(s => CreateMessage(s))
-                .ToArrayAsync();
+                .ToListAsync();
             
-            return new Result<IEnumerable<Message>>(ResultStatus.Success, messages);
+            return new Result<IReadOnlyCollection<Message>>(ResultStatus.Success, messages);
         }
 
         /// <inheritdoc/>
-        public async Task<Result<IEnumerable<Message>>> GetLastChatMessages(int chatId, string currentUserId, DateTimeOffset fromDateTime)
+        public async Task<Result<IReadOnlyCollection<Message>>> GetLastChatMessages(int chatId, string currentUserId, DateTimeOffset fromDateTime)
         {
             var result = await CheckChatExistsAndCurrentUserHasPermissions(chatId, currentUserId);
             if (!result.IsSuccess)
@@ -46,9 +46,9 @@ namespace Sulimov.MyChat.Server.BL.Services
             var messages = await dbContext.Messages
                 .Where(w => w.ChatId == chatId && w.DateTime >= fromDateTime)
                 .Select(s => CreateMessage(s))
-                .ToArrayAsync();
+                .ToListAsync();
 
-            return new Result<IEnumerable<Message>>(ResultStatus.Success, messages);
+            return new Result<IReadOnlyCollection<Message>>(ResultStatus.Success, messages);
         }
 
         /// <inheritdoc/>
@@ -61,18 +61,18 @@ namespace Sulimov.MyChat.Server.BL.Services
 
             if (chat == null)
             {
-                return new Result<Message>(ResultStatus.ObjectNotFound, new Message(), "Chat not found.");
+                return new Result<Message>(ResultStatus.ObjectNotFound, "Chat not found.");
             }
 
             var sender = await dbContext.Users.FirstOrDefaultAsync(f => f.Id == senderId);
             if (sender == null)
             {
-                return new Result<Message>(ResultStatus.ObjectNotFound, new Message(), $"Sender {senderId} not found.");
+                return new Result<Message>(ResultStatus.ObjectNotFound, $"Sender {senderId} not found.");
             }
 
             if (!chat.Users.Any(a => a.User.Id == senderId))
             {
-                return new Result<Message>(ResultStatus.ObjectNotFound, new Message(), $"Sender {senderId} isn't included to chat {chatId}.");
+                return new Result<Message>(ResultStatus.ObjectNotFound, $"Sender {senderId} isn't included to chat {chatId}.");
             }
             
             var dbModel = new DbMessage
@@ -89,7 +89,7 @@ namespace Sulimov.MyChat.Server.BL.Services
             return new Result<Message>(ResultStatus.Success, CreateMessage(dbModel));
         }
 
-        private async Task<Result<IEnumerable<Message>>> CheckChatExistsAndCurrentUserHasPermissions(int chatId, string currentUserId)
+        private async Task<Result<IReadOnlyCollection<Message>>> CheckChatExistsAndCurrentUserHasPermissions(int chatId, string currentUserId)
         {
             var chat = await dbContext.Chats
                 .Include(i => i.Users)
@@ -98,32 +98,25 @@ namespace Sulimov.MyChat.Server.BL.Services
 
             if (chat == null)
             {
-                return new Result<IEnumerable<Message>>(ResultStatus.ObjectNotFound, Array.Empty<Message>(), $"Chat {chatId} not found.");
+                return new Result<IReadOnlyCollection<Message>>(ResultStatus.ObjectNotFound, $"Chat {chatId} not found.");
             }
 
             if (!chat.Users.Any(a => a.User.Id == currentUserId))
             {
-                return new Result<IEnumerable<Message>>(ResultStatus.AccessDenied, Array.Empty<Message>(), $"User {currentUserId} doesn't have access to chat {chatId}");
+                return new Result<IReadOnlyCollection<Message>>(ResultStatus.AccessDenied, $"User {currentUserId} doesn't have access to chat {chatId}");
             }
 
-            return new Result<IEnumerable<Message>>(ResultStatus.Success, Array.Empty<Message>());
+            return new Result<IReadOnlyCollection<Message>>(ResultStatus.Success, Array.Empty<Message>());
         }
 
         private static Message CreateMessage(DbMessage dbMessage)
         {
-            return new Message
-            {
-                Id = dbMessage.Id,
-                ChatId = dbMessage.ChatId,
-                DateTime = dbMessage.DateTime,
-                Text = dbMessage.Text,
-                Sender = new User
-                {
-                    Id = dbMessage.Sender.Id,
-                    Name = dbMessage.Sender.UserName,
-                    Email = dbMessage.Sender.Email,
-                }
-            };
+            return new Message(
+                id: dbMessage.Id,
+                dateTime: dbMessage.DateTime,
+                chatId: dbMessage.ChatId,
+                text: dbMessage.Text,
+                sender: new User(id: dbMessage.Sender.Id, name: dbMessage.Sender.UserName, email: dbMessage.Sender.Email));
         }
     }
 }

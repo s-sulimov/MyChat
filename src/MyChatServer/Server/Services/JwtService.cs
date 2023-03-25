@@ -21,7 +21,7 @@ namespace Sulimov.MyChat.Server.Services
         }
 
         /// <inheritdoc/>
-        public AuthenticationResponse CreateToken(DbUser user, IEnumerable<Claim> roleClaims)
+        public AuthenticationResponse CreateToken(DbUser user, IReadOnlyCollection<Claim> roleClaims)
         {
             var expiration = DateTime.UtcNow.AddMinutes(expirationMinutes);
 
@@ -45,7 +45,7 @@ namespace Sulimov.MyChat.Server.Services
                 signingCredentials: credentials
             );
 
-        private static Claim[] CreateClaims(DbUser user, IEnumerable<Claim> roleClaims)
+        private static Claim[] CreateClaims(DbUser user, IReadOnlyCollection<Claim> roleClaims)
         {
             var claims = new List<Claim>()
             {

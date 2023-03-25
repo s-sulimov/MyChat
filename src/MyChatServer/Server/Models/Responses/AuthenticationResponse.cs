@@ -6,19 +6,14 @@
     public class AuthenticationResponse
     {
         /// <summary>
-        /// Default instance of the <see cref="AuthenticationResponse"/>
-        /// </summary>
-        public static AuthenticationResponse Instance { get; } = new AuthenticationResponse(string.Empty, default);
-        
-        /// <summary>
         /// JWT token.
         /// </summary>
-        public string Token { get; set; }
+        public string Token { get; }
 
         /// <summary>
         /// Token expiration date and time.
         /// </summary>
-        public DateTime Expiration { get; set; }
+        public DateTime Expiration { get; }
 
         public AuthenticationResponse(string token, DateTime expirationDate)
         {

@@ -16,7 +16,7 @@ namespace Sulimov.MyChat.Server.Core.Models
         /// <summary>
         /// Result data.
         /// </summary>
-        public T Data { get; set; }
+        public T? Data { get; set; }
 
         /// <summary>
         /// Result message.
@@ -35,10 +35,10 @@ namespace Sulimov.MyChat.Server.Core.Models
             Message = string.Empty;
         }
 
-        public Result(ResultStatus status, T data, string message)
+        public Result(ResultStatus status, string message)
         {
             Status = status;
-            Data = data;
+            Data = null;
             Message = message;
         }
     }

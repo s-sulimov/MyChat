@@ -8,11 +8,17 @@
         /// <summary>
         /// Identifier.
         /// </summary>
-        public int Id { get; set; }
+        public int Id { get; }
 
         /// <summary>
         /// Role name.
         /// </summary>
-        public string Name { get; set; } = string.Empty;
+        public string Name { get; }
+
+        public ChatRoleDto(int id, string name)
+        {
+            Id = id;
+            Name = name;
+        }
     }
 }

@@ -36,7 +36,7 @@ namespace Sulimov.MyChat.Server.BL.FunctionalTests
             var result = await chatService.GetUserChats(userId);
 
             // Assert.
-            Assert.AreEqual(expectedChatsCount, result.Data.Count());
+            Assert.AreEqual(expectedChatsCount, result.Data?.Count ?? 0);
         }
 
         [TestMethod]
@@ -44,7 +44,7 @@ namespace Sulimov.MyChat.Server.BL.FunctionalTests
         [DataRow("New chat 2", new string[] { "1", "2" }, "8", false)]
         [DataRow("New chat 3", new string[] { }, "3", false)]
         [DataRow("New chat 4", new string[] { "1", "2" }, "3", true)]
-        public async Task CreateChat(string title, IEnumerable<string> userIds, string ownerId, bool expected)
+        public async Task CreateChat(string title, IReadOnlyCollection<string> userIds, string ownerId, bool expected)
         {
             // Arrange.
             await ResetDataBase();
@@ -144,7 +144,7 @@ namespace Sulimov.MyChat.Server.BL.FunctionalTests
             var result = await chatService.GetChatUsers(chatId);
 
             // Assert.
-            Assert.AreEqual(usersCountExpected, result.Count());
+            Assert.AreEqual(usersCountExpected, result.Count);
         }
 
         private async Task ResetDataBase()
