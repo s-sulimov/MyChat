@@ -51,12 +51,10 @@ namespace Sulimov.MyChat.Server.BL.Services
 
             var sb = new StringBuilder();
 
-            foreach (string userId in userIds)
+            var unknownUsers = userIds.Where(w => !dbUsers.ContainsKey(w));
+            foreach (string unknownUser in unknownUsers)
             {
-                if (!dbUsers.TryGetValue(userId, out _))
-                {
-                    sb.AppendLine(new CultureInfo("en-US"), $"User {userId} not found.");
-                }
+                sb.AppendLine(new CultureInfo("en-US"), $"User {unknownUser} not found.");
             }
 
             DbUser? dbOwner;
