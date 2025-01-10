@@ -12,10 +12,8 @@ namespace Sulimov.MyChat.Server.DAL
         public DbSet<DbChat> Chats { get; set; }
         public DbSet<DbChatRole> ChatRoles { get; set; }
 
-#pragma warning disable CS8618 // JUSTIFICATION: Can't be resolved.
         public DataContext(DbContextOptions<DataContext> options)
             : base(options) { }
-#pragma warning restore CS8618
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

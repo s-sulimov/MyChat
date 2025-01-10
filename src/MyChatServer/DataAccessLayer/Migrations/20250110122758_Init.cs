@@ -3,10 +3,14 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
+
 namespace Sulimov.MyChat.Server.DAL.Migrations
 {
+    /// <inheritdoc />
     public partial class Init : Migration
     {
+        /// <inheritdoc />
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1861:Avoid constant arrays as arguments", Justification = "<Pending>")]
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -252,8 +256,8 @@ namespace Sulimov.MyChat.Server.DAL.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "72105689-2de4-429d-8423-414ef9d5d238", "5eedf3c4-345f-431c-9823-6e8d2fca73a0", "User", "User" },
-                    { "912ec413-7a16-4344-b07b-8bb39590ad01", "48733624-f771-4500-9a4d-b9c03fa2ac31", "Admin", "Admin" }
+                    { "5940119f-feee-4f05-8e67-c7188dcd5f88", null, "Admin", "Admin" },
+                    { "a5505b2f-affa-4469-a67f-8e9a6b0d7c78", null, "User", "User" }
                 });
 
             migrationBuilder.InsertData(
@@ -336,6 +340,7 @@ namespace Sulimov.MyChat.Server.DAL.Migrations
                 column: "SenderId");
         }
 
+        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(

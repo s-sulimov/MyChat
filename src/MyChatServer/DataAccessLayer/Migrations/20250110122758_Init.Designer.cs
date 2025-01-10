@@ -12,17 +12,18 @@ using Sulimov.MyChat.Server.DAL;
 namespace Sulimov.MyChat.Server.DAL.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20230322150549_Init")]
+    [Migration("20250110122758_Init")]
     partial class Init
     {
+        /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.13")
+                .HasAnnotation("ProductVersion", "8.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
@@ -53,15 +54,13 @@ namespace Sulimov.MyChat.Server.DAL.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "912ec413-7a16-4344-b07b-8bb39590ad01",
-                            ConcurrencyStamp = "48733624-f771-4500-9a4d-b9c03fa2ac31",
+                            Id = "5940119f-feee-4f05-8e67-c7188dcd5f88",
                             Name = "Admin",
                             NormalizedName = "Admin"
                         },
                         new
                         {
-                            Id = "72105689-2de4-429d-8423-414ef9d5d238",
-                            ConcurrencyStamp = "5eedf3c4-345f-431c-9823-6e8d2fca73a0",
+                            Id = "a5505b2f-affa-4469-a67f-8e9a6b0d7c78",
                             Name = "User",
                             NormalizedName = "User"
                         });
@@ -73,7 +72,7 @@ namespace Sulimov.MyChat.Server.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ClaimType")
                         .HasColumnType("nvarchar(max)");
@@ -98,7 +97,7 @@ namespace Sulimov.MyChat.Server.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ClaimType")
                         .HasColumnType("nvarchar(max)");
@@ -179,7 +178,7 @@ namespace Sulimov.MyChat.Server.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("DbUserId")
                         .HasColumnType("nvarchar(450)");
@@ -201,7 +200,7 @@ namespace Sulimov.MyChat.Server.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -235,7 +234,7 @@ namespace Sulimov.MyChat.Server.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int?>("DbChatId")
                         .HasColumnType("int");
@@ -264,7 +263,7 @@ namespace Sulimov.MyChat.Server.DAL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("ChatId")
                         .HasColumnType("int");
