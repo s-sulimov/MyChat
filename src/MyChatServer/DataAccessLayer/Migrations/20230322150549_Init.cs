@@ -7,6 +7,7 @@ namespace Sulimov.MyChat.Server.DAL.Migrations
 {
     public partial class Init : Migration
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1861:Avoid constant arrays as arguments", Justification = "<Pending>")]
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(

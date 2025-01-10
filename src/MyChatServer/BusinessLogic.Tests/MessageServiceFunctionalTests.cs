@@ -11,7 +11,7 @@ namespace Sulimov.MyChat.Server.BL.FunctionalTests
     public class MessageServiceFunctionalTests
     {        
         DbContextOptions<DataContext> options;
-        IMessageService messageService;
+        readonly MessageService messageService;
 
         public MessageServiceFunctionalTests()
         {

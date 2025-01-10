@@ -40,7 +40,7 @@ namespace Sulimov.MyChat.Server.BL.Services
         /// <inheritdoc/>
         public async Task<Result<Chat>> CreateChat(string title, IReadOnlyCollection<string> userIds, string ownerId)
         {
-            if (!userIds.Any())
+            if (userIds.Count == 0)
             {
                 return new Result<Chat>(ResultStatus.InconsistentData, "Chat hasn't any user.");
             }

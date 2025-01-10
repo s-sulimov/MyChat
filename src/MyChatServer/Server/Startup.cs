@@ -64,7 +64,7 @@ namespace Sulimov.MyChat.Server
                         ValidAudience = configuration["Jwt:Audience"],
                         ValidIssuer = configuration["Jwt:Issuer"],
                         IssuerSigningKey = new SymmetricSecurityKey(
-                            Encoding.UTF8.GetBytes(configuration["Jwt:Key"])
+                            Encoding.UTF8.GetBytes(configuration["Jwt:Key"]!)
                         )
                     };
                 });

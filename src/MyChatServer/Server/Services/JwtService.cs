@@ -52,9 +52,9 @@ namespace Sulimov.MyChat.Server.Services
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString(new CultureInfo("en-US"))),
-                new Claim(ClaimTypes.Name, user.UserName),
-                new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.NameIdentifier, user.UserName),
+                new Claim(ClaimTypes.Name, user.UserName!),
+                new Claim(ClaimTypes.Email, user.Email!),
+                new Claim(ClaimTypes.NameIdentifier, user.UserName!),
             };
 
             foreach (Claim claim in roleClaims)
@@ -68,7 +68,7 @@ namespace Sulimov.MyChat.Server.Services
         private SigningCredentials CreateSigningCredentials() =>
             new SigningCredentials(
                 new SymmetricSecurityKey(
-                    Encoding.UTF8.GetBytes(configuration["Jwt:Key"])
+                    Encoding.UTF8.GetBytes(configuration["Jwt:Key"]!)
                 ),
                 SecurityAlgorithms.HmacSha256
             );

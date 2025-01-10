@@ -24,7 +24,7 @@ namespace Sulimov.MyChat.Server.Services
 
         public async Task<Result<AuthenticationResponse>> Login(string userName, string password)
         {
-            DbUser user = await userManager.FindByNameAsync(userName) ?? await userManager.FindByEmailAsync(userName);
+            DbUser? user = await userManager.FindByNameAsync(userName) ?? await userManager.FindByEmailAsync(userName);
             if (user == null)
             {
                 return new Result<AuthenticationResponse>(ResultStatus.ObjectNotFound, $"User {userName} not found.");
