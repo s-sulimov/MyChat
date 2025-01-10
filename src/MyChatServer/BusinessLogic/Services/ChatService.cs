@@ -297,7 +297,7 @@ namespace Sulimov.MyChat.Server.BL.Services
                 users: chat.Users
                     .Select(s => new ChatUser(
                         id: s.Id,
-                        user: new User(s.User.Id, s.User.UserName, s.User.Email),
+                        user: new User(s.User.Id, s.User.UserName!, s.User.Email!),
                         role: new ChatRole(s.Role.Id, s.Role.Name)))
                     .ToList());
         }

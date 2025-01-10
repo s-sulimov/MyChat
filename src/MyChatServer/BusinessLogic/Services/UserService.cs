@@ -85,6 +85,11 @@ namespace Sulimov.MyChat.Server.BL.Services
             }
 
             var dbUser = await userManager.FindByNameAsync(userName);
+            if (dbUser == null)
+            {
+                return new Result<User>(ResultStatus.ObjectNotFound, "User with this credentials wasn't created");
+            }
+
             var addRoleResult = await userManager.AddToRoleAsync(dbUser, Constants.IdentityUserRoleName);
             if (!addRoleResult.Succeeded)
             {
@@ -97,7 +102,7 @@ namespace Sulimov.MyChat.Server.BL.Services
         /// <inheritdoc/>
         public async Task<Result<User>> GetUser(string userName)
         {
-            DbUser dbUser = await userManager.FindByNameAsync(userName) ?? await userManager.FindByEmailAsync(userName);
+            DbUser? dbUser = await userManager.FindByNameAsync(userName) ?? await userManager.FindByEmailAsync(userName);
             if (dbUser == null)
             {
                 return new Result<User>(ResultStatus.ObjectNotFound, $"User with login or email {userName} not found.");
@@ -108,7 +113,7 @@ namespace Sulimov.MyChat.Server.BL.Services
 
         private static User CreateUser(DbUser dbUser)
         {
-            return new User(id: dbUser.Id, name: dbUser.UserName, email: dbUser.Email);
+            return new User(id: dbUser.Id, name: dbUser.UserName!, email: dbUser.Email!);
         }
     }
 }
