@@ -79,6 +79,7 @@ namespace Sulimov.MyChat.Server
 
             services.AddSwaggerGen();
             services.AddSignalR();
+            services.AddHttpLogging(o => { });
 
             services.AddControllers()
                 .AddNewtonsoftJson();

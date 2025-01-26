@@ -51,7 +51,7 @@ namespace Sulimov.MyChat.Server.Services
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString(new CultureInfo("en-US"))),
+                new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.Ticks.ToString(new CultureInfo("en-US"))),
                 new Claim(ClaimTypes.Name, user.UserName!),
                 new Claim(ClaimTypes.Email, user.Email!),
                 new Claim(ClaimTypes.NameIdentifier, user.UserName!),
