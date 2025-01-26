@@ -1,7 +1,25 @@
 <Project>
+
+  <!--Build properties-->
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AnalysisMode>Recommended</AnalysisMode>
+    <AnalysisModeSecurity>All</AnalysisModeSecurity>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+    <!--Code analizing properties-->
   <PropertyGroup>
     <AnalysisMode>Recommended</AnalysisMode>
     <AnalysisModeSecurity>All</AnalysisModeSecurity>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
+
+  <!--Package management properties-->
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
 </Project>

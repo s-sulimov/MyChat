@@ -9,7 +9,8 @@
 1. Run MS SQLServer in Docker:
 <br />`docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=S3cur3P@ssW0rd!" -p 1433:1433 -d -v my-chat-server_sqlData:/var/opt/mssql mcr.microsoft.com/mssql/server:2022-latest`
 2. Open `src\MyChatServer\MyChatServer.sln` in Visual Studio.
-3. Set connection string in `appsetings.Development.json`.
+3. Set connection string in `appsetings.Development.json`:
+<br />`Server=localhost;Database=myChat;User Id=sa;Password=S3cur3P@ssW0rd!;TrustServerCertificate=True;`
 4. Press `F5` to run in debug mode.
 
 **BUILD**

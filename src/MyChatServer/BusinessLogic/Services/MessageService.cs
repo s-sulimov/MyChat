@@ -116,7 +116,7 @@ namespace Sulimov.MyChat.Server.BL.Services
                 dateTime: dbMessage.DateTime,
                 chatId: dbMessage.ChatId,
                 text: dbMessage.Text,
-                sender: new User(id: dbMessage.Sender.Id, name: dbMessage.Sender.UserName, email: dbMessage.Sender.Email));
+                sender: new User(id: dbMessage.Sender.Id, name: dbMessage.Sender.UserName!, email: dbMessage.Sender.Email!));
         }
     }
 }
