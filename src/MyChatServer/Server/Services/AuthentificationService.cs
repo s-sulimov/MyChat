@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Sulimov.MyChat.Server.Core.Enums;
 using Sulimov.MyChat.Server.Core.Models;
+using Sulimov.MyChat.Server.Core.Models.Responses;
 using Sulimov.MyChat.Server.DAL.Models;
-using Sulimov.MyChat.Server.Models.Responses;
 using System.Security.Claims;
 
 namespace Sulimov.MyChat.Server.Services

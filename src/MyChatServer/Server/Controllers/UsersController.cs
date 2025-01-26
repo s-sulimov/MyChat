@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Sulimov.MyChat.Server.Core.Models;
+using Sulimov.MyChat.Server.Core.Models.Responses;
 using Sulimov.MyChat.Server.Core.Services;
 using Sulimov.MyChat.Server.Helpers;
 using Sulimov.MyChat.Server.Models;

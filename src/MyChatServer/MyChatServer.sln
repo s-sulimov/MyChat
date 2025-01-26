@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core", "Core\Core.csproj", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BusinessLogic.FunctionalTests", "BusinessLogic.Tests\BusinessLogic.FunctionalTests.csproj", "{A04A1826-E9A7-4799-B8A3-73989F1AB128}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Server.Authorization", "Server.Authorization\Server.Authorization.csproj", "{BDEE77D6-6115-4568-983B-A1C1107C3EDB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{A04A1826-E9A7-4799-B8A3-73989F1AB128}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A04A1826-E9A7-4799-B8A3-73989F1AB128}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A04A1826-E9A7-4799-B8A3-73989F1AB128}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BDEE77D6-6115-4568-983B-A1C1107C3EDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BDEE77D6-6115-4568-983B-A1C1107C3EDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BDEE77D6-6115-4568-983B-A1C1107C3EDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BDEE77D6-6115-4568-983B-A1C1107C3EDB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

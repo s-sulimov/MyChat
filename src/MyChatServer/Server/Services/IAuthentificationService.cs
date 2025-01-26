@@ -1,5 +1,5 @@
 ﻿using Sulimov.MyChat.Server.Core.Models;
-using Sulimov.MyChat.Server.Models.Responses;
+using Sulimov.MyChat.Server.Core.Models.Responses;
 
 namespace Sulimov.MyChat.Server.Services
 {
