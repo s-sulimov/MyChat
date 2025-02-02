@@ -77,6 +77,8 @@ namespace Sulimov.MyChat.Server
             services.AddScoped<IChatService, ChatService>();
             services.AddScoped<IUserService, UserService>();
 
+            services.AddScoped<HttpClient>();
+
             services.AddSwaggerGen();
             services.AddSignalR();
             services.AddHttpLogging(o => { });

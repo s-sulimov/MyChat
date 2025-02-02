@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Sulimov.MyChat.Server.Authorization.Models;
+namespace Sulimov.MyChat.Server.Core.Models.Requests;
 
 /// <summary>
 /// Request for token creation.
