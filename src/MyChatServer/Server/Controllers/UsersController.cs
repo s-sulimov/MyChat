@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Sulimov.MyChat.Server.Core.Enums;
 using Sulimov.MyChat.Server.Core.Models;
+using Sulimov.MyChat.Server.Core.Models.Requests;
 using Sulimov.MyChat.Server.Core.Models.Responses;
 using Sulimov.MyChat.Server.Core.Services;
 using Sulimov.MyChat.Server.Helpers;
@@ -15,18 +17,18 @@ namespace Sulimov.MyChat.Server.Controllers
     [Authorize]
     public class UsersController : ControllerBase
     {
-        private readonly IAuthentificationService authentificationService;
+        private readonly IAuthorizationClient authorizationClient;
         private readonly IUserService userService;
         private readonly IHttpContextAccessor httpContextAccessor;
 
         public UsersController(
             IUserService userService,
             IHttpContextAccessor httpContextAccessor,
-            IAuthentificationService authentificationService)
+            IAuthorizationClient authorizationClient)
         {
             this.userService = userService;
             this.httpContextAccessor = httpContextAccessor;
-            this.authentificationService = authentificationService;
+            this.authorizationClient = authorizationClient;
         }
 
         // api/users
@@ -61,12 +63,22 @@ namespace Sulimov.MyChat.Server.Controllers
         [Produces("application/json")]
         public async Task<ActionResult<AuthenticationResponse>> Login(AuthenticationRequest request)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest();
-            }
+            var result = await authorizationClient.Login(request);
 
-            var result = await authentificationService.Login(request.Login, request.Password);
+            if (!result.IsSuccess)
+            {
+                if (result.Status == ResultStatus.AccessDenied)
+                {
+                    return Forbid();
+                }
+
+                if (result.Status == ResultStatus.InconsistentData)
+                {
+                    return BadRequest();
+                }
+
+                return Problem(statusCode: 500);
+            }
 
             return ResultHelper.CreateHttpResult<AuthenticationResponse, AuthenticationResponse>(this, result);
         }

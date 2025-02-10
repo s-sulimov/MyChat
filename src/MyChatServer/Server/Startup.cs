@@ -71,8 +71,7 @@ namespace Sulimov.MyChat.Server
 
             services.AddHttpContextAccessor();
 
-            services.AddScoped<IJwtService, JwtService>();
-            services.AddScoped<IAuthentificationService, AuthentificationService>();
+            services.AddScoped<IAuthorizationClient, AuthorizationClient>();
             services.AddScoped<IMessageService, MessageService>();
             services.AddScoped<IChatService, ChatService>();
             services.AddScoped<IUserService, UserService>();
