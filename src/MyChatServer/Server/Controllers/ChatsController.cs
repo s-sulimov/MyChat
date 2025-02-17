@@ -3,10 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Sulimov.MyChat.Server.Core.Models;
 using Sulimov.MyChat.Server.Core.Services;
-using Sulimov.MyChat.Server.Helpers;
+using Sulimov.MyChat.Server.Core.Helpers;
 using Sulimov.MyChat.Server.Hubs;
 using Sulimov.MyChat.Server.Models;
-using Sulimov.MyChat.Server.Models.Responses;
+using Sulimov.MyChat.Server.Core.Models.Responses;
 
 namespace Sulimov.MyChat.Server.Controllers
 {

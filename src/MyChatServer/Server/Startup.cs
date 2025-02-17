@@ -1,12 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 using Sulimov.MyChat.Server.BL.Services;
 using Sulimov.MyChat.Server.Core.Services;
 using Sulimov.MyChat.Server.DAL;
-using Sulimov.MyChat.Server.DAL.Models;
 using Sulimov.MyChat.Server.Hubs;
 using Sulimov.MyChat.Server.Services;
 using System.Text;
@@ -36,22 +34,6 @@ namespace Sulimov.MyChat.Server
             services.AddDbContext<DataContext>(opt => opt.UseSqlServer(connectionString));
 
             services
-                .AddIdentityCore<DbUser>(options =>
-                {
-                    options.SignIn.RequireConfirmedAccount = false;
-                    options.User.RequireUniqueEmail = true;
-                    options.Password.RequireDigit = false;
-                    options.Password.RequiredLength = 6;
-                    options.Password.RequireNonAlphanumeric = false;
-                    options.Password.RequireUppercase = false;
-                    options.Password.RequireLowercase = false;
-                })
-                .AddRoles<IdentityRole>()
-                .AddDefaultTokenProviders()
-                .AddSignInManager()
-                .AddEntityFrameworkStores<DataContext>();
-
-            services
                 .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
@@ -74,7 +56,7 @@ namespace Sulimov.MyChat.Server
             services.AddScoped<IAuthorizationClient, AuthorizationClient>();
             services.AddScoped<IMessageService, MessageService>();
             services.AddScoped<IChatService, ChatService>();
-            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IUserClient, UserClient>();
 
             services.AddScoped<HttpClient>();
 

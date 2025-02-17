@@ -1,13 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Sulimov.MyChat.Server.Core.Enums;
-using Sulimov.MyChat.Server.Core.Models;
+using Sulimov.MyChat.Server.Core.Helpers;
 using Sulimov.MyChat.Server.Core.Models.Requests;
 using Sulimov.MyChat.Server.Core.Models.Responses;
-using Sulimov.MyChat.Server.Core.Services;
-using Sulimov.MyChat.Server.Helpers;
-using Sulimov.MyChat.Server.Models;
-using Sulimov.MyChat.Server.Models.Responses;
 using Sulimov.MyChat.Server.Services;
 
 namespace Sulimov.MyChat.Server.Controllers
@@ -18,15 +15,17 @@ namespace Sulimov.MyChat.Server.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IAuthorizationClient authorizationClient;
-        private readonly IUserService userService;
+        private readonly IUserClient userClient;
         private readonly IHttpContextAccessor httpContextAccessor;
 
+        private const string TOKEN_NAME = "access_token";
+
         public UsersController(
-            IUserService userService,
+            IUserClient userClient,
             IHttpContextAccessor httpContextAccessor,
             IAuthorizationClient authorizationClient)
         {
-            this.userService = userService;
+            this.userClient = userClient;
             this.httpContextAccessor = httpContextAccessor;
             this.authorizationClient = authorizationClient;
         }
@@ -36,9 +35,10 @@ namespace Sulimov.MyChat.Server.Controllers
         [Produces("application/json")]
         public async Task<ActionResult<UserDto>> GetUser(string name)
         {
-            var result = await userService.GetUser(name);
+            var token = await HttpContext.GetTokenAsync(TOKEN_NAME);
+            var result = await userClient.GetUser(name, token);
 
-            return ResultHelper.CreateHttpResult<User, UserDto>(this, result);
+            return ResultHelper.CreateHttpResult<UserDto, UserDto>(this, result);
         }
 
         // api/users/create
@@ -47,14 +47,9 @@ namespace Sulimov.MyChat.Server.Controllers
         [Produces("application/json")]
         public async Task<ActionResult<UserDto>> CreateUser(CreateUserRequest request)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest();
-            }
+            var result = await userClient.CreateUser(request.Name, request.Email, request.Password);
 
-            var result = await userService.CreateUser(request.Name, request.Email, request.Password);
-
-            return ResultHelper.CreateHttpResult<User, UserDto>(this, result);
+            return ResultHelper.CreateHttpResult<UserDto, UserDto>(this, result);
         }
 
         // api/users/login
@@ -88,15 +83,11 @@ namespace Sulimov.MyChat.Server.Controllers
         [Produces("application/json")]
         public async Task<ActionResult<UserDto>> ChangeEmail(ChangeUserEmailRequest request)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest();
-            }
-
+            var token = await HttpContext.GetTokenAsync(TOKEN_NAME);
             var userId = ControllerHelper.GetCurrentUserId(httpContextAccessor);
-            var result = await userService.ChangeEmail(userId, request.Password, request.Email);
+            var result = await userClient.ChangeEmail(userId, request.Password, request.Email, token);
 
-            return ResultHelper.CreateHttpResult<User, UserDto>(this, result);
+            return ResultHelper.CreateHttpResult<UserDto, UserDto>(this, result);
         }
 
         // api/users/change-password
@@ -104,15 +95,11 @@ namespace Sulimov.MyChat.Server.Controllers
         [Produces("application/json")]
         public async Task<ActionResult<UserDto>> ChangePassword(ChangeUserPasswordRequest request)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest();
-            }
-
+            var token = await HttpContext.GetTokenAsync(TOKEN_NAME);
             var userId = ControllerHelper.GetCurrentUserId(httpContextAccessor);
-            var result = await userService.ChangePassword(userId, request.CurrentPassword, request.NewPassword);
+            var result = await userClient.ChangePassword(userId, request.CurrentPassword, request.NewPassword, token);
 
-            return ResultHelper.CreateHttpResult<User, UserDto>(this, result);
+            return ResultHelper.CreateHttpResult<UserDto, UserDto>(this, result);
         }
     }
 }
