@@ -32,7 +32,7 @@ public class UserClient : IUserClient
             Email = email,
         };
 
-        string? baseUrl = configuration.GetSection("Services").GetValue<string>("Authorization");
+        string? baseUrl = GetAuthorizarionUrl();
         string authServiceUri = $"{baseUrl}/api/users/change-email";
         string bodyContent = JsonConvert.SerializeObject(requestData);
 
@@ -48,7 +48,7 @@ public class UserClient : IUserClient
             NewPassword = newPassword,
         };
 
-        string? baseUrl = configuration.GetSection("Services").GetValue<string>("Authorization");
+        string? baseUrl = GetAuthorizarionUrl();
         string authServiceUri = $"{baseUrl}/api/users/change-password";
         string bodyContent = JsonConvert.SerializeObject(requestData);
 
@@ -65,7 +65,7 @@ public class UserClient : IUserClient
             Password = password,
         };
 
-        string? baseUrl = configuration.GetSection("Services").GetValue<string>("Authorization");
+        string? baseUrl = GetAuthorizarionUrl();
         string authServiceUri = $"{baseUrl}/api/users/create";
         string bodyContent = JsonConvert.SerializeObject(requestData);
 
@@ -77,7 +77,7 @@ public class UserClient : IUserClient
     {
         SetToken(token);
 
-        string? baseUrl = configuration.GetSection("Services").GetValue<string>("Authorization");
+        string? baseUrl = GetAuthorizarionUrl();
         string authServiceUri = $"{baseUrl}/api/users/user?name={userName}";
 
         using var response = await this.httpClient.GetAsync(authServiceUri);
@@ -142,5 +142,16 @@ public class UserClient : IUserClient
         }
 
         this.httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+    }
+
+    private string GetAuthorizarionUrl()
+    {
+        string? authServiceUri = configuration.GetSection("Services").GetValue<string>("Authorization");
+        if (string.IsNullOrEmpty(authServiceUri))
+        {
+            authServiceUri = Environment.GetEnvironmentVariable("AUTHORIZATION_URL") ?? string.Empty;
+        }
+
+        return authServiceUri;
     }
 }

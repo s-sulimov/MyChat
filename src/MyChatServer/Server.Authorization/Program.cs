@@ -23,6 +23,10 @@ builder.Services.AddSwaggerGen();
 
 // DB context
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+if (string.IsNullOrEmpty(connectionString))
+{
+    connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING") ?? string.Empty;
+}
 builder.Services.AddDbContext<DataContext>(opt => opt.UseSqlServer(connectionString));
 
 // Authentication

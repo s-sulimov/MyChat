@@ -2,9 +2,24 @@ version: "3.8"
 name: "my-chat-server"
 services:
   api:
-    build: /MyChatServer
+    build:
+      context: /MyChatServer
+      dockerfile: Dockerfile
+      target: server-final
     ports:
-      - "80:80"
+      - "8080:8080"
+    environment:
+      - CONNECTION_STRING=Server=db;Database=myChat;User=sa;Password=S3cur3P@ssW0rd!;TrustServerCertificate=Yes;
+      - AUTHORIZATION_URL=http://authorization:8080
+    depends_on:
+      - db
+      - authorization
+
+  authorization:
+    build:
+      context: /MyChatServer
+      dockerfile: Dockerfile
+      target: authorization-final
     environment:
       - CONNECTION_STRING=Server=db;Database=myChat;User=sa;Password=S3cur3P@ssW0rd!;TrustServerCertificate=Yes;
     depends_on:

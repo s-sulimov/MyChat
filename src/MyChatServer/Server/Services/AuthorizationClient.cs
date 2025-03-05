@@ -30,6 +30,11 @@ public class AuthorizationClient : IAuthorizationClient
             "application/json");
 
         string? authServiceUri = configuration.GetSection("Services").GetValue<string>("Authorization");
+        if (string.IsNullOrEmpty(authServiceUri))
+        {
+            authServiceUri = Environment.GetEnvironmentVariable("AUTHORIZATION_URL") ?? string.Empty;
+        }
+
         using var response = await this.httpClient.PostAsync($"{authServiceUri}/api/authorization/login", requestContent);
 
         if (response == null)
