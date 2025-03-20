@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Sulimov.MyChat.Server.Authorization.Services;
+using Sulimov.MyChat.Server.Core.Services;
 using Sulimov.MyChat.Server.DAL;
 using Sulimov.MyChat.Server.DAL.Models;
 using System.Text;
@@ -13,6 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
+builder.Services.AddSingleton<ICacheService, CacheService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IAuthentificationService, AuthentificationService>();
 builder.Services.AddScoped<IUserService, UserService>();

@@ -1,69 +1,82 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿namespace Sulimov.MyChat.Server.Authorization.Services;
+
+using Microsoft.AspNetCore.Identity;
 using Sulimov.MyChat.Server.Core;
 using Sulimov.MyChat.Server.Core.Enums;
 using Sulimov.MyChat.Server.Core.Models;
+using Sulimov.MyChat.Server.Core.Services;
 using Sulimov.MyChat.Server.DAL.Models;
-
-namespace Sulimov.MyChat.Server.Authorization.Services;
 
 /// <inheritdoc/>
 public class UserService : IUserService
 {
     private readonly UserManager<DbUser> userManager;
     private readonly SignInManager<DbUser> signInManager;
+    private readonly ICacheService cacheService;
 
-    public UserService(UserManager<DbUser> userManager, SignInManager<DbUser> signInManager)
+    private readonly TimeSpan cacheExpirationTime = TimeSpan.FromMinutes(30);
+
+    public UserService(UserManager<DbUser> userManager, SignInManager<DbUser> signInManager, ICacheService cacheService)
     {
         this.userManager = userManager;
         this.signInManager = signInManager;
+        this.cacheService = cacheService;
     }
 
     /// <inheritdoc/>
     public async Task<Result<User>> ChangeEmail(string userId, string password, string email)
     {
-        var user = await userManager.FindByIdAsync(userId);
-        if (user == null)
+        var dbUser = await userManager.FindByIdAsync(userId);
+        if (dbUser == null)
         {
             return new Result<User>(ResultStatus.ObjectNotFound, $"User {userId} not found.");
         }
 
-        var checkPasswordResult = await signInManager.CheckPasswordSignInAsync(user, password, false);
+        var checkPasswordResult = await signInManager.CheckPasswordSignInAsync(dbUser, password, false);
         if (!checkPasswordResult.Succeeded)
         {
             return new Result<User>(ResultStatus.InconsistentData, "Bad credentials");
         }
 
-        var token = await userManager.GenerateChangeEmailTokenAsync(user, email);
+        var token = await userManager.GenerateChangeEmailTokenAsync(dbUser, email);
         if (token == null)
         {
             return new Result<User>(ResultStatus.InconsistentData, "Bad email");
         }
 
-        var result = await userManager.ChangeEmailAsync(user, email, token);
+        var result = await userManager.ChangeEmailAsync(dbUser, email, token);
         if (!result.Succeeded)
         {
             return new Result<User>(ResultStatus.InconsistentData, Constants.UnknownErrorMessage);
         }
 
-        return new Result<User>(ResultStatus.Success, CreateUser(user));
+        var user = CreateUser(dbUser);
+        await this.cacheService.RemoveAsync(CachedDataType.User, user.Name);
+        await this.cacheService.SetAsync(CachedDataType.User, user.Name, user, this.cacheExpirationTime);
+
+        return new Result<User>(ResultStatus.Success, user);
     }
 
     /// <inheritdoc/>
     public async Task<Result<User>> ChangePassword(string userId, string currentPassword, string newPassword)
     {
-        var user = await userManager.FindByIdAsync(userId);
-        if (user == null)
+        var dbUser = await userManager.FindByIdAsync(userId);
+        if (dbUser == null)
         {
             return new Result<User>(ResultStatus.ObjectNotFound, $"User {userId} not found.");
         }
 
-        var result = await userManager.ChangePasswordAsync(user, currentPassword, newPassword);
+        var result = await userManager.ChangePasswordAsync(dbUser, currentPassword, newPassword);
         if (!result.Succeeded)
         {
             return new Result<User>(ResultStatus.InconsistentData, Constants.UnknownErrorMessage);
         }
 
-        return new Result<User>(ResultStatus.Success, CreateUser(user));
+        var user = CreateUser(dbUser);
+        await this.cacheService.RemoveAsync(CachedDataType.User, user.Name);
+        await this.cacheService.SetAsync(CachedDataType.User, user.Name, user, this.cacheExpirationTime);
+
+        return new Result<User>(ResultStatus.Success, user);
     }
 
     /// <inheritdoc/>
@@ -95,7 +108,10 @@ public class UserService : IUserService
             return new Result<User>(ResultStatus.InconsistentData, Constants.UnknownErrorMessage);
         }
 
-        return new Result<User>(ResultStatus.Success, CreateUser(dbUser));
+        var user = CreateUser(dbUser);
+        await this.cacheService.SetAsync(CachedDataType.User, user.Name, user, this.cacheExpirationTime);
+
+        return new Result<User>(ResultStatus.Success, user);
     }
 
     /// <inheritdoc/>
@@ -107,7 +123,10 @@ public class UserService : IUserService
             return new Result<User>(ResultStatus.ObjectNotFound, $"User with login or email {userName} not found.");
         }
 
-        return new Result<User>(ResultStatus.Success, CreateUser(dbUser));
+        var user = CreateUser(dbUser);
+        await this.cacheService.SetAsync(CachedDataType.User, user.Name, user, this.cacheExpirationTime);
+
+        return new Result<User>(ResultStatus.Success, user);
     }
 
     private static User CreateUser(DbUser dbUser)

@@ -11,8 +11,10 @@ services:
     environment:
       - CONNECTION_STRING=Server=db;Database=myChat;User=sa;Password=S3cur3P@ssW0rd!;TrustServerCertificate=Yes;
       - AUTHORIZATION_URL=http://authorization:8080
+      - REDIS_URL=redis:6379
     depends_on:
       - db
+      - redis
       - authorization
 
   authorization:
@@ -22,8 +24,16 @@ services:
       target: authorization-final
     environment:
       - CONNECTION_STRING=Server=db;Database=myChat;User=sa;Password=S3cur3P@ssW0rd!;TrustServerCertificate=Yes;
+      - REDIS_URL=redis:6379
     depends_on:
       - db
+      - redis
+
+  redis:
+    image: redis/redis-stack:latest
+    ports:
+      - "6379:6379" # Redis server port
+      - "8001:8001" # RedisInsight port
 
   db:
     image: mcr.microsoft.com/mssql/server:2022-latest

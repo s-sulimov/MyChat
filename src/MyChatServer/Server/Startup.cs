@@ -53,6 +53,7 @@ namespace Sulimov.MyChat.Server
 
             services.AddHttpContextAccessor();
 
+            services.AddSingleton<ICacheService, CacheService>();
             services.AddScoped<IAuthorizationClient, AuthorizationClient>();
             services.AddScoped<IMessageService, MessageService>();
             services.AddScoped<IChatService, ChatService>();

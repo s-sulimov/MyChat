@@ -5,6 +5,7 @@ using Sulimov.MyChat.Server.Core.Enums;
 using Sulimov.MyChat.Server.Core.Helpers;
 using Sulimov.MyChat.Server.Core.Models.Requests;
 using Sulimov.MyChat.Server.Core.Models.Responses;
+using Sulimov.MyChat.Server.Core.Services;
 using Sulimov.MyChat.Server.Services;
 
 namespace Sulimov.MyChat.Server.Controllers
@@ -17,17 +18,20 @@ namespace Sulimov.MyChat.Server.Controllers
         private readonly IAuthorizationClient authorizationClient;
         private readonly IUserClient userClient;
         private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly ICacheService cacheService;
 
         private const string TOKEN_NAME = "access_token";
 
         public UsersController(
             IUserClient userClient,
             IHttpContextAccessor httpContextAccessor,
-            IAuthorizationClient authorizationClient)
+            IAuthorizationClient authorizationClient,
+            ICacheService cacheService)
         {
             this.userClient = userClient;
             this.httpContextAccessor = httpContextAccessor;
             this.authorizationClient = authorizationClient;
+            this.cacheService = cacheService;
         }
 
         // api/users
@@ -35,6 +39,12 @@ namespace Sulimov.MyChat.Server.Controllers
         [Produces("application/json")]
         public async Task<ActionResult<UserDto>> GetUser(string name)
         {
+            var userFromCache = await cacheService.GetAsync<UserDto>(CachedDataType.User, name);
+            if (userFromCache != null)
+            {
+                return Ok(userFromCache);
+            }
+
             var token = await HttpContext.GetTokenAsync(TOKEN_NAME);
             var result = await userClient.GetUser(name, token);
 
