@@ -1,11 +1,11 @@
 ﻿namespace Sulimov.MyChat.Server.Authorization.Services;
 
 using Microsoft.AspNetCore.Identity;
+using Sulimov.MyChat.Server.Authorization.DataAccessLayer;
 using Sulimov.MyChat.Server.Core;
 using Sulimov.MyChat.Server.Core.Enums;
 using Sulimov.MyChat.Server.Core.Models;
 using Sulimov.MyChat.Server.Core.Services;
-using Sulimov.MyChat.Server.DAL.Models;
 
 /// <inheritdoc/>
 public class UserService : IUserService

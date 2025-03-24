@@ -2,10 +2,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Sulimov.MyChat.Server.Authorization.DataAccessLayer;
 using Sulimov.MyChat.Server.Authorization.Services;
 using Sulimov.MyChat.Server.Core.Services;
-using Sulimov.MyChat.Server.DAL;
-using Sulimov.MyChat.Server.DAL.Models;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
